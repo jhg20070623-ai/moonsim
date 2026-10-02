@@ -3,6 +3,7 @@
 pub enum BatchPolicy {
   FixedTime(Int)
   FixedBatch(Int)
+  Hybrid(Int, Int)
 }
 
 ///|
@@ -29,6 +30,22 @@ pub fn BatchPolicy::fixed_batch(
 }
 
 ///|
+/// Creates a policy that releases on batch size or oldest-item timeout,
+/// whichever happens first.
+pub fn BatchPolicy::hybrid(
+  batch_size : Int,
+  max_wait : Int,
+) -> Result[BatchPolicy, String] {
+  if batch_size <= 0 {
+    Err("hybrid batch size must be positive")
+  } else if max_wait <= 0 {
+    Err("hybrid max wait must be positive")
+  } else {
+    Ok(Hybrid(batch_size, max_wait))
+  }
+}
+
+///|
 /// Checks whether a policy should release the current waiting batch.
 pub fn BatchPolicy::should_trigger(
   self : BatchPolicy,
@@ -43,6 +60,11 @@ pub fn BatchPolicy::should_trigger(
     match self {
       FixedTime(interval) => Ok(waiting_count > 0 && oldest_wait >= interval)
       FixedBatch(batch_size) => Ok(waiting_count >= batch_size)
+      Hybrid(batch_size, max_wait) =>
+        Ok(
+          waiting_count >= batch_size ||
+          (waiting_count > 0 && oldest_wait >= max_wait),
+        )
     }
   }
 }

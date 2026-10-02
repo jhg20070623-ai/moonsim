@@ -270,6 +270,27 @@ test "batch policies reject invalid configuration and observations" {
 }
 
 ///|
+test "hybrid batching triggers on quantity or timeout" {
+  let policy = @moonsim.BatchPolicy::hybrid(4, 6).unwrap()
+  assert_false(policy.should_trigger(0, 20).unwrap())
+  assert_false(policy.should_trigger(3, 5).unwrap())
+  assert_true(policy.should_trigger(4, 0).unwrap())
+  assert_true(policy.should_trigger(2, 6).unwrap())
+}
+
+///|
+test "hybrid policy rejects non-positive thresholds" {
+  match @moonsim.BatchPolicy::hybrid(0, 5) {
+    Err(message) => assert_eq(message, "hybrid batch size must be positive")
+    Ok(_) => fail("zero hybrid batch size was accepted")
+  }
+  match @moonsim.BatchPolicy::hybrid(2, 0) {
+    Err(message) => assert_eq(message, "hybrid max wait must be positive")
+    Ok(_) => fail("zero hybrid timeout was accepted")
+  }
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id

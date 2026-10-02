@@ -55,3 +55,11 @@
 - **Issue:** Policies are decision rules only; models remain responsible for scheduling timeout events and clearing a released batch.
 - **Validation:** Tests cover threshold boundaries, empty batches, oversized batches, and invalid configuration/observations.
 - **Next:** Add a hybrid policy that triggers on either threshold.
+
+## 2026-10-02 — Hybrid batching policy
+
+- **Implemented:** A policy that releases when a batch reaches its item threshold or the oldest item reaches its timeout.
+- **Design:** A timeout cannot release an empty batch; quantity threshold takes effect regardless of elapsed wait.
+- **Issue:** Timeout scheduling remains the responsibility of the simulation model using the scheduler.
+- **Validation:** Tests cover both trigger paths, empty batches, and invalid thresholds.
+- **Next:** Add deterministic seeded random draws.
