@@ -10,3 +10,5 @@
 - Add entities with cycle-time tracking and reusable station routes.
 - Add fixed-time and fixed-count batch release policies.
 - Add a hybrid batch policy that releases on quantity or oldest-item timeout.
+- Add a seedable ChaCha8 random source and simulation-level deterministic draws.
+- Document event-ordering and random-stream reproducibility guarantees.

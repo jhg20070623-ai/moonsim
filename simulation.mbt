@@ -3,6 +3,7 @@
 pub struct Simulation {
   priv clock : SimulationClock
   priv queue : EventQueue
+  priv random : RandomSource
   priv mut next_event_id : Int
   priv mut next_sequence : Int
 }
@@ -10,11 +11,22 @@ pub struct Simulation {
 ///|
 /// Creates an empty simulation at time zero.
 pub fn Simulation::new() -> Simulation {
-  Simulation::{
-    clock: SimulationClock::new(),
-    queue: EventQueue::new(),
-    next_event_id: 0,
-    next_sequence: 0,
+  Simulation::with_seed(0).unwrap()
+}
+
+///|
+/// Creates a simulation with a deterministic random stream for `seed`.
+pub fn Simulation::with_seed(seed : Int) -> Result[Simulation, String] {
+  match RandomSource::new(seed) {
+    Err(message) => Err(message)
+    Ok(random) =>
+      Ok(Simulation::{
+        clock: SimulationClock::new(),
+        queue: EventQueue::new(),
+        random,
+        next_event_id: 0,
+        next_sequence: 0,
+      })
   }
 }
 
@@ -28,6 +40,21 @@ pub fn Simulation::now(self : Simulation) -> Int {
 /// Returns the number of events waiting to run.
 pub fn Simulation::pending_events(self : Simulation) -> Int {
   self.queue.length()
+}
+
+///|
+/// Draws an unbiased integer in `[0, limit)` from this simulation's random stream.
+pub fn Simulation::random_int_below(
+  self : Simulation,
+  limit : Int,
+) -> Result[Int, String] {
+  self.random.int_below(limit)
+}
+
+///|
+/// Draws a Double in `[0.0, 1.0)` from this simulation's random stream.
+pub fn Simulation::random_double(self : Simulation) -> Double {
+  self.random.next_double()
 }
 
 ///|

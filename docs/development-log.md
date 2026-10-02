@@ -63,3 +63,12 @@
 - **Issue:** Timeout scheduling remains the responsibility of the simulation model using the scheduler.
 - **Validation:** Tests cover both trigger paths, empty batches, and invalid thresholds.
 - **Next:** Add deterministic seeded random draws.
+
+## 2026-10-02 — Seeded random source
+
+- **Implemented:** A `RandomSource` backed by MoonBit core's ChaCha8 generator, integer seed expansion, bounded unbiased integer draws, and `[0,1)` Double draws. Simulations can be created with `with_seed` and draw from their owned stream.
+- **Design:** A stable SplitMix64 expansion turns one non-negative integer seed into the standard library's required 32-byte ChaCha8 key. The random package is part of MoonBit core, not an external dependency.
+- **Issue:** Repeatability is defined for the same MoonSim and MoonBit core versions; future generator changes will be documented because they change generated sequences.
+- **Validation:** Equal seeds produce equal integer and Double sequences; bounded draw ranges and invalid seed/limit inputs are checked.
+- **Documentation:** `docs/reproducibility.md` records event ordering, seed expansion, and version scope.
+- **Next:** Add simulation metrics.

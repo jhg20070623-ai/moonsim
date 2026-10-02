@@ -291,6 +291,42 @@ test "hybrid policy rejects non-positive thresholds" {
 }
 
 ///|
+test "random sources reproduce streams from the same seed" {
+  let first = @moonsim.RandomSource::new(42).unwrap()
+  let second = @moonsim.RandomSource::new(42).unwrap()
+  assert_eq(first.next_int(), second.next_int())
+  assert_eq(first.int_below(17).unwrap(), second.int_below(17).unwrap())
+  assert_eq(first.next_double(), second.next_double())
+  let bounded = first.int_below(5).unwrap()
+  assert_true(bounded >= 0 && bounded < 5)
+  let value = first.next_double()
+  assert_true(value >= 0.0 && value < 1.0)
+  assert_true(
+    @moonsim.RandomSource::new(42).unwrap().next_int() !=
+    @moonsim.RandomSource::new(43).unwrap().next_int(),
+  )
+}
+
+///|
+test "simulation random stream is seeded and validates limits" {
+  let first = @moonsim.Simulation::with_seed(7).unwrap()
+  let second = @moonsim.Simulation::with_seed(7).unwrap()
+  assert_eq(
+    first.random_int_below(100).unwrap(),
+    second.random_int_below(100).unwrap(),
+  )
+  assert_eq(first.random_double(), second.random_double())
+  assert_eq(
+    first.random_int_below(0),
+    Err("random integer limit must be positive"),
+  )
+  match @moonsim.RandomSource::new(-1) {
+    Err(message) => assert_eq(message, "random seed must be non-negative")
+    Ok(_) => fail("negative random seed was accepted")
+  }
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id
