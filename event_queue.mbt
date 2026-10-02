@@ -23,6 +23,16 @@ pub fn EventQueue::is_empty(self : EventQueue) -> Bool {
 }
 
 ///|
+/// Returns the next event without removing it.
+pub fn EventQueue::peek(self : EventQueue) -> Event? {
+  if self.items.length() == 0 {
+    None
+  } else {
+    Some(self.items[0])
+  }
+}
+
+///|
 /// Adds an event while preserving the queue's total ordering.
 pub fn EventQueue::push(self : EventQueue, event : Event) -> Unit {
   self.items.push(event)

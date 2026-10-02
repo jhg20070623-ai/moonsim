@@ -15,3 +15,11 @@
 - **Issue:** The official core includes a priority queue, but its generic comparison interface is unnecessary for closures stored in events; a focused heap avoids imposing comparison traits on callbacks.
 - **Validation:** A test checks mixed timestamps/priorities and FIFO ordering for same-time same-priority events.
 - **Next:** Add the simulation scheduler and run loop.
+
+## 2026-10-02 — Simulation scheduler and run loop
+
+- **Implemented:** Event IDs and insertion sequence allocation, absolute-time scheduling, full `run()`, and inclusive `run_until()` with clock advancement to the requested boundary.
+- **Design:** Scheduling into the past and moving the run boundary backwards return descriptive errors. Events exactly on the `run_until` boundary execute.
+- **Issue:** The scheduler relies on queue-owned insertion sequence values. The current event constructor remains public for low-level queue use; later APIs may narrow that surface.
+- **Validation:** Tests cover ID assignment, deterministic execution ordering, queue draining, `run_until` boundary semantics, and invalid time requests.
+- **Next:** Add reusable capacity-limited resources.
