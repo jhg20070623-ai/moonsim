@@ -47,3 +47,11 @@
 - **Issue:** Entity metadata is omitted until a concrete typed metadata use case exists; the core does not expose an untyped map prematurely.
 - **Validation:** Tests cover route traversal, final-station completion, cycle time, invalid timestamps, and empty route inputs.
 - **Next:** Add batching policies.
+
+## 2026-10-02 — Fixed-time and fixed-batch policies
+
+- **Implemented:** Policy constructors and trigger checks for fixed-time and fixed-count batch release.
+- **Design:** Fixed-time duration is measured from the oldest waiting item; empty batches never trigger. Fixed-batch ignores elapsed time and triggers once the count reaches its threshold.
+- **Issue:** Policies are decision rules only; models remain responsible for scheduling timeout events and clearing a released batch.
+- **Validation:** Tests cover threshold boundaries, empty batches, oversized batches, and invalid configuration/observations.
+- **Next:** Add a hybrid policy that triggers on either threshold.

@@ -238,6 +238,38 @@ test "entity and route validate their inputs" {
 }
 
 ///|
+test "fixed-time and fixed-batch policies use their thresholds" {
+  let fixed_time = @moonsim.BatchPolicy::fixed_time(5).unwrap()
+  assert_false(fixed_time.should_trigger(0, 8).unwrap())
+  assert_false(fixed_time.should_trigger(2, 4).unwrap())
+  assert_true(fixed_time.should_trigger(2, 5).unwrap())
+
+  let fixed_batch = @moonsim.BatchPolicy::fixed_batch(3).unwrap()
+  assert_false(fixed_batch.should_trigger(2, 10).unwrap())
+  assert_true(fixed_batch.should_trigger(3, 0).unwrap())
+  assert_true(fixed_batch.should_trigger(4, 0).unwrap())
+}
+
+///|
+test "batch policies reject invalid configuration and observations" {
+  match @moonsim.BatchPolicy::fixed_time(0) {
+    Err(message) => assert_eq(message, "fixed-time interval must be positive")
+    Ok(_) => fail("zero fixed-time interval was accepted")
+  }
+  match @moonsim.BatchPolicy::fixed_batch(-1) {
+    Err(message) => assert_eq(message, "fixed batch size must be positive")
+    Ok(_) => fail("negative batch size was accepted")
+  }
+
+  let policy = @moonsim.BatchPolicy::fixed_batch(2).unwrap()
+  assert_eq(
+    policy.should_trigger(-1, 0),
+    Err("waiting count cannot be negative"),
+  )
+  assert_eq(policy.should_trigger(1, -1), Err("oldest wait cannot be negative"))
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id
