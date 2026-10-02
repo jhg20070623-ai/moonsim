@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-10-02 — Manufacturing line and CI
+
+- **Implemented:** A seven-station model using 12/8/6/10/5/4/9 tick processing times, 20 entities, and six-tick arrival spacing. Each entity follows a Route and traverses per-station Resource and Queue state.
+- **Metrics:** The runnable model prints cycle time, time-weighted WIP, throughput, mean station queue wait, and per-station utilization. Its README records observed output and the input assumptions.
+- **Data provenance:** Historical optimization figures are in a separate background note and explicitly identified as owner-supplied data, not MoonSim output.
+- **CI:** Added a GitHub Actions workflow using MoonBit's published installer script and running formatting, type checking, and tests.
+- **Validation:** The manufacturing example ran successfully; fmt/check/test will be rerun before this increment is committed.
+- **Next:** Build the logistics batching comparison.
+
 ## 2026-10-02 — Project bootstrap and clock/event model
 
 - **Implemented:** MoonBit module metadata, Apache-2.0 license, initial clock and event APIs, and executable unit tests.

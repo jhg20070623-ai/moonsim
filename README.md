@@ -4,9 +4,25 @@ MoonSim is a lightweight and reproducible discrete-event simulation engine writt
 
 MoonSim targets manufacturing, logistics, queueing, and process simulation. The current core provides a monotonic integer-tick clock, validated event actions, a stable priority queue, a scheduler with `run()` and `run_until()`, capacity-limited resources with utilization tracking, a generic FIFO queue with waiting-time statistics, route-following entities, fixed-time/fixed-count/hybrid batch policies, a reproducible seeded random stream, and metrics for cycle time, waiting time, WIP, throughput, and queue length.
 
-## Development status
+## Features
 
-This repository is at the start of development. The current API is intentionally small and does not yet claim to provide a complete simulator.
+- Integer-tick simulation clock and deterministic event ordering.
+- Capacity-limited resources and generic FIFO queues with waiting statistics.
+- Entities that follow reusable named routes.
+- Fixed-time, fixed-batch, and hybrid batch trigger policies.
+- Seeded random values and collection of cycle time, waiting time, WIP, throughput, and queue length.
+
+The package is under active development. It focuses on a small core that examples can compose; it does not provide a visual model editor or a built-in manufacturing workflow.
+
+## Quick start
+
+Create a simulation with @moonsim.Simulation::with_seed(42), schedule actions, and call run(). For a complete queueing model, run:
+
+    moon run examples/basic_queue
+
+## Architecture
+
+The scheduler owns the simulation clock and stable event heap. Event actions update resource, queue, entity, and metrics state at integer timestamps. Models are composed by scheduling actions; MoonSim does not hard-code a particular production line or logistics process.
 
 ## Deterministic simulation
 
@@ -15,6 +31,8 @@ Simulation time uses integer ticks, and event ordering uses timestamp, priority,
 ## Examples
 
 - [Basic queue](examples/basic_queue/README.md): arrivals, FIFO waiting, one capacity-limited machine, service completion, and collected metrics.
+- [Manufacturing line](examples/manufacturing_line/README.md): 20 entities routed through seven capacity-limited stations.
+- See the [roadmap](docs/roadmap.md) and [historical case-study background](docs/case-study-background.md).
 
 ## Build and test
 

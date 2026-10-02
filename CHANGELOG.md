@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a runnable seven-station manufacturing line with computed flow metrics.
+- Add architecture, roadmap, and historical case-study background documentation.
+- Add GitHub Actions checks for formatting, type checking, and tests.
 - Initialize the MoonBit module and add a monotonic simulation clock with validated event actions.
 - Add a binary-heap event queue ordered by time, priority, and insertion sequence.
 - Add `Simulation::schedule`, `run`, and inclusive `run_until` processing.
