@@ -8,13 +8,13 @@ This is a working project roadmap, not a promise that every item is already impl
 - Capacity-limited resources, FIFO queues, routes, and entities.
 - Fixed-time, fixed-batch, and hybrid batch trigger policies.
 - Seeded random source and core flow metrics.
-- Runnable queueing and manufacturing examples. The logistics comparison is in progress.
+- Runnable queueing, manufacturing, and logistics batching examples.
 
 ## Next engineering steps
 
-- Complete the logistics batching comparison and document its assumptions and observed output.
 - Improve per-entity queue wait recording and model-level invariants.
 - Add targeted tests for manufacturing and batching example behavior.
+- Verify the new GitHub Actions workflow on the public repository.
 - Consider priority queues, cancellation, and replication summaries only after the current API and examples are stable.
 
 ## Out of scope for this initial iteration

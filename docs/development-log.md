@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-10-02 — Logistics batching example
+
+- **Implemented:** A runnable comparison of FixedTime(5), FixedBatch(3), and Hybrid(3, 5) using the same 17 scheduled arrivals and the MoonSim BatchPolicy trigger API.
+- **Model assumptions:** Released batches share a two-tick delivery delay. A residual FixedBatch is released at end of intake; overdue means waiting strictly more than five ticks.
+- **Metrics:** The example computes each entity's waiting time, completed count, throughput, batch count, timeout releases, overdue entities, and end-of-intake partial batches. Its README records observed output.
+- **Validation:** Run the comparison and full moon fmt/check/test before committing.
+- **Next:** Verify CI behavior on GitHub after the workflow can be pushed.
+
 ## 2026-10-02 — Manufacturing line and CI
 
 - **Implemented:** A seven-station model using 12/8/6/10/5/4/9 tick processing times, 20 entities, and six-tick arrival spacing. Each entity follows a Route and traverses per-station Resource and Queue state.

@@ -32,6 +32,7 @@ Simulation time uses integer ticks, and event ordering uses timestamp, priority,
 
 - [Basic queue](examples/basic_queue/README.md): arrivals, FIFO waiting, one capacity-limited machine, service completion, and collected metrics.
 - [Manufacturing line](examples/manufacturing_line/README.md): 20 entities routed through seven capacity-limited stations.
+- [Logistics batching](examples/logistics_batching/README.md): a measured comparison of fixed-time, fixed-batch, and hybrid releases.
 - See the [roadmap](docs/roadmap.md) and [historical case-study background](docs/case-study-background.md).
 
 ## Build and test
