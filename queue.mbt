@@ -7,11 +7,11 @@ struct QueueEntry[T] {
 ///|
 /// A FIFO queue that records wait time for each successfully dequeued item.
 pub struct Queue[T] {
-  mut entries : Array[QueueEntry[T]]
-  mut head : Int
-  mut last_operation_time : Int
-  mut total_waiting_time : Int
-  mut dequeued_count : Int
+  priv mut entries : Array[QueueEntry[T]]
+  priv mut head : Int
+  priv mut last_operation_time : Int
+  priv mut total_waiting_time : Int
+  priv mut dequeued_count : Int
 }
 
 ///|

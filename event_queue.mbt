@@ -1,7 +1,7 @@
 ///|
 /// A min-heap ordered by event time, numeric priority, then insertion sequence.
 pub struct EventQueue {
-  items : Array[Event]
+  priv items : Array[Event]
 }
 
 ///|

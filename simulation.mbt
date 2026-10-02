@@ -1,10 +1,10 @@
 ///|
 /// Discrete-event simulation state and event-processing loop.
 pub struct Simulation {
-  clock : SimulationClock
-  queue : EventQueue
-  mut next_event_id : Int
-  mut next_sequence : Int
+  priv clock : SimulationClock
+  priv queue : EventQueue
+  priv mut next_event_id : Int
+  priv mut next_sequence : Int
 }
 
 ///|

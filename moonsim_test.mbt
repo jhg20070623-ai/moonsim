@@ -194,6 +194,50 @@ test "FIFO queue compaction preserves remaining items" {
 }
 
 ///|
+test "entity advances along reusable routes and tracks cycle time" {
+  let route = @moonsim.Route::new(["cut", "drill", "pack"]).unwrap()
+  let entity = @moonsim.Entity::new(42, 3).unwrap()
+  assert_eq(route.length(), 3)
+  assert_eq(entity.id(), 42)
+  assert_eq(entity.created_at(), 3)
+  assert_eq(entity.route_position(), -1)
+  assert_eq(entity.current_station(route), None)
+  assert_eq(entity.advance_route(route), Some("cut"))
+  assert_eq(entity.current_station(route), Some("cut"))
+  assert_eq(entity.advance_route(route), Some("drill"))
+  assert_eq(entity.advance_route(route), Some("pack"))
+  assert_eq(entity.advance_route(route), None)
+  assert_eq(entity.route_position(), 2)
+  assert_eq(entity.cycle_time_at(11).unwrap(), 8)
+  assert_eq(
+    entity.cycle_time_at(2),
+    Err("entity cycle time cannot precede creation"),
+  )
+}
+
+///|
+test "entity and route validate their inputs" {
+  match @moonsim.Entity::new(-1, 0) {
+    Err(message) => assert_eq(message, "entity ID must be non-negative")
+    Ok(_) => fail("negative entity ID was accepted")
+  }
+  match @moonsim.Entity::new(1, -1) {
+    Err(message) =>
+      assert_eq(message, "entity creation time must be non-negative")
+    Ok(_) => fail("negative entity creation time was accepted")
+  }
+  match @moonsim.Route::new([]) {
+    Err(message) =>
+      assert_eq(message, "route must contain at least one station")
+    Ok(_) => fail("empty route was accepted")
+  }
+  match @moonsim.Route::new(["cut", ""]) {
+    Err(message) => assert_eq(message, "route station name cannot be empty")
+    Ok(_) => fail("empty station name was accepted")
+  }
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id

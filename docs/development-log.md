@@ -39,3 +39,11 @@
 - **Issue:** A head cursor avoids shifting on each removal; consumed storage is cleared or compacted to prevent indefinite retention of old entries.
 - **Validation:** Tests cover FIFO behavior, waiting time totals and averages, empty dequeue, and timestamp reversal.
 - **Next:** Add entities and reusable process routes.
+
+## 2026-10-02 — Entities and routes
+
+- **Implemented:** Entities with stable IDs, creation times, route progress, and cycle-time queries; routes are validated station sequences shared independently of the entity model.
+- **Design:** Route station storage is copied and hidden so callers cannot mutate a route after construction. Entity route progress starts before station zero and stops at the final station.
+- **Issue:** Entity metadata is omitted until a concrete typed metadata use case exists; the core does not expose an untyped map prematurely.
+- **Validation:** Tests cover route traversal, final-station completion, cycle time, invalid timestamps, and empty route inputs.
+- **Next:** Add batching policies.

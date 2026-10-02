@@ -6,7 +6,7 @@ pub struct Event {
   time : Int
   priority : Int
   sequence : Int
-  action : () -> Unit
+  priv action : () -> Unit
 }
 
 ///|
