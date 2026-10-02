@@ -327,6 +327,61 @@ test "simulation random stream is seeded and validates limits" {
 }
 
 ///|
+test "metrics report cycle time, waiting time, WIP, throughput, and queue length" {
+  let metrics = @moonsim.Metrics::new(0).unwrap()
+  let first = @moonsim.Entity::new(1, 0).unwrap()
+  let second = @moonsim.Entity::new(2, 2).unwrap()
+  metrics.record_entity_created(first).unwrap()
+  metrics.record_queue_length(1, 0).unwrap()
+  metrics.record_entity_created(second).unwrap()
+  metrics.record_queue_length(2, 2).unwrap()
+  metrics.record_waiting_time(3, 4).unwrap()
+  metrics.record_entity_completed(first, 6).unwrap()
+  metrics.record_queue_length(0, 6).unwrap()
+  metrics.record_entity_completed(second, 8).unwrap()
+
+  assert_eq(metrics.simulation_time(8).unwrap(), 8)
+  assert_eq(metrics.entity_created_count(), 2)
+  assert_eq(metrics.entity_completed_count(), 2)
+  assert_eq(metrics.wip(), 0)
+  assert_eq(metrics.max_wip(), 2)
+  assert_eq(metrics.mean_cycle_time(), 6.0)
+  assert_eq(metrics.mean_waiting_time(), 3.0)
+  assert_eq(metrics.throughput(8).unwrap(), 0.25)
+  assert_eq(metrics.average_wip(8).unwrap(), 1.5)
+  assert_eq(metrics.queue_length(), 0)
+  assert_eq(metrics.max_queue_length(), 2)
+  assert_eq(metrics.average_queue_length(8).unwrap(), 1.25)
+}
+
+///|
+test "metrics reject invalid counts and timestamps without corrupting state" {
+  let metrics = @moonsim.Metrics::new(0).unwrap()
+  let entity = @moonsim.Entity::new(1, 0).unwrap()
+  match metrics.record_entity_completed(entity, 1) {
+    Err(message) =>
+      assert_eq(message, "cannot complete an entity when WIP is zero")
+    Ok(_) => fail("completion with zero WIP was accepted")
+  }
+  assert_eq(metrics.wip(), 0)
+  assert_eq(
+    metrics.record_waiting_time(-1, 1),
+    Err("waiting time cannot be negative"),
+  )
+  assert_eq(
+    metrics.record_queue_length(-1, 1),
+    Err("queue length cannot be negative"),
+  )
+  metrics.record_entity_created(entity).unwrap()
+  assert_eq(metrics.record_queue_length(1, 2), Ok(()))
+  assert_eq(
+    metrics.record_queue_length(2, 1),
+    Err("metrics observation time cannot move backwards"),
+  )
+  assert_eq(metrics.wip(), 1)
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id

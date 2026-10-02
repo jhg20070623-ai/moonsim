@@ -12,3 +12,4 @@
 - Add a hybrid batch policy that releases on quantity or oldest-item timeout.
 - Add a seedable ChaCha8 random source and simulation-level deterministic draws.
 - Document event-ordering and random-stream reproducibility guarantees.
+- Add time-weighted entity, WIP, throughput, waiting-time, and queue-length metrics.

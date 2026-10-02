@@ -72,3 +72,11 @@
 - **Validation:** Equal seeds produce equal integer and Double sequences; bounded draw ranges and invalid seed/limit inputs are checked.
 - **Documentation:** `docs/reproducibility.md` records event ordering, seed expansion, and version scope.
 - **Next:** Add simulation metrics.
+
+## 2026-10-02 — Simulation metrics
+
+- **Implemented:** Entity creation/completion counts, cycle time, waiting-time summaries, current/maximum WIP, throughput, and current/maximum/time-weighted queue length. Resource utilization remains available from `Resource::utilization_at`.
+- **Design:** WIP and queue averages use time-weighted areas between observation changes. Throughput is completed entities divided by elapsed observation ticks. Metrics record explicit entity and queue observations; they do not infer missing events.
+- **Issue:** Metrics are opt-in and must be updated by model actions; this keeps the engine from fabricating measurements.
+- **Validation:** Tests verify formulas with hand-computable observations and ensure invalid counts/timestamps do not corrupt collector state.
+- **Next:** Add the basic queue example using only current engine APIs.
