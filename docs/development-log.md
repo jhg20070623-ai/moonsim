@@ -5,7 +5,7 @@
 - **Implemented:** A runnable comparison of FixedTime(5), FixedBatch(3), and Hybrid(3, 5) using the same 17 scheduled arrivals and the MoonSim BatchPolicy trigger API.
 - **Model assumptions:** Released batches share a two-tick delivery delay. A residual FixedBatch is released at end of intake; overdue means waiting strictly more than five ticks.
 - **Metrics:** The example computes each entity's waiting time, completed count, throughput, batch count, timeout releases, overdue entities, and end-of-intake partial batches. Its README records observed output.
-- **Validation:** Run the comparison and full moon fmt/check/test before committing.
+- **Validation:** The comparison ran for all three policies, all three reported 17 completions with zero WIP, and the full moon fmt/check/test suite passed.
 - **Next:** Verify CI behavior on GitHub after the workflow can be pushed.
 
 ## 2026-10-02 — Manufacturing line and CI
@@ -14,7 +14,7 @@
 - **Metrics:** The runnable model prints cycle time, time-weighted WIP, throughput, mean station queue wait, and per-station utilization. Its README records observed output and the input assumptions.
 - **Data provenance:** Historical optimization figures are in a separate background note and explicitly identified as owner-supplied data, not MoonSim output.
 - **CI:** Added a GitHub Actions workflow using MoonBit's published installer script and running formatting, type checking, and tests.
-- **Validation:** The manufacturing example ran successfully; fmt/check/test will be rerun before this increment is committed.
+- **Validation:** The manufacturing example completed 20/20 entities with zero WIP; moon fmt, moon check, and moon test passed before commit.
 - **Next:** Build the logistics batching comparison.
 
 ## 2026-10-02 — Project bootstrap and clock/event model

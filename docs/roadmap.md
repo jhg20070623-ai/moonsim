@@ -12,7 +12,7 @@ This is a working project roadmap, not a promise that every item is already impl
 
 ## Next engineering steps
 
-- Improve per-entity queue wait recording and model-level invariants.
+- Improve per-entity queue wait integration with the aggregate Metrics collector.
 - Add targeted tests for manufacturing and batching example behavior.
 - Verify the new GitHub Actions workflow on the public repository.
 - Consider priority queues, cancellation, and replication summaries only after the current API and examples are stable.

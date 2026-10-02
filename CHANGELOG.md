@@ -6,6 +6,7 @@
 - Add architecture, roadmap, and historical case-study background documentation.
 - Add GitHub Actions checks for formatting, type checking, and tests.
 - Add a runnable logistics example comparing all three batch policies and recording measured wait and timeout statistics.
+- Add completion and zero-WIP guards to all three examples and run them in CI.
 - Initialize the MoonBit module and add a monotonic simulation clock with validated event actions.
 - Add a binary-heap event queue ordered by time, priority, and insertion sequence.
 - Add `Simulation::schedule`, `run`, and inclusive `run_until` processing.

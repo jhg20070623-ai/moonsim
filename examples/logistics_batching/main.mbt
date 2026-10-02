@@ -13,7 +13,7 @@ struct BatchState {
 }
 
 ///|
-fn main {
+fn main raise {
   let fixed_time = @moonsim.BatchPolicy::fixed_time(5).unwrap()
   let fixed_batch = @moonsim.BatchPolicy::fixed_batch(3).unwrap()
   let hybrid = @moonsim.BatchPolicy::hybrid(3, 5).unwrap()
@@ -23,7 +23,7 @@ fn main {
 }
 
 ///|
-fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit {
+fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit raise {
   let sim = @moonsim.Simulation::new()
   let state = BatchState::{
     policy,
@@ -82,6 +82,11 @@ fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit {
   }
 
   let events_processed = sim.run()
+  if state.metrics.entity_completed_count() != arrivals.length() ||
+    state.metrics.wip() != 0 ||
+    state.queue.length() != 0 {
+    fail("batch policy left entities incomplete or waiting")
+  }
   let now = sim.now()
   println("Policy: \{label}")
   println("  Entities completed: \{state.metrics.entity_completed_count()}")

@@ -1,5 +1,5 @@
 ///|
-fn main {
+fn main raise {
   let sim = @moonsim.Simulation::new()
   let machine = @moonsim.Resource::new("machine", 1).unwrap()
   let queue : @moonsim.Queue[@moonsim.Entity] = @moonsim.Queue::new()
@@ -16,6 +16,12 @@ fn main {
   }
 
   let processed = sim.run()
+  if metrics.entity_completed_count() != arrivals.length() ||
+    metrics.wip() != 0 ||
+    queue.length() != 0 ||
+    machine.used() != 0 {
+    fail("basic queue did not complete all entities and drain")
+  }
   let now = sim.now()
   println("Events processed: \{processed}")
   println("Completed entities: \{metrics.entity_completed_count()}")

@@ -26,3 +26,8 @@ jobs:
         run: moon check
       - name: Run tests
         run: moon test
+      - name: Run examples
+        run: |
+          moon run examples/basic_queue
+          moon run examples/manufacturing_line
+          moon run examples/logistics_batching

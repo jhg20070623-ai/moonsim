@@ -7,7 +7,7 @@ struct Workstation {
 }
 
 ///|
-fn main {
+fn main raise {
   let sim = @moonsim.Simulation::new()
   let route = @moonsim.Route::new([
     "cutting", "drilling", "welding", "painting", "assembly", "inspection", "packaging",
@@ -46,6 +46,9 @@ fn main {
   }
 
   let processed_events = sim.run()
+  if metrics.entity_completed_count() != entity_count || metrics.wip() != 0 {
+    fail("manufacturing line did not complete all entities and drain WIP")
+  }
   let now = sim.now()
   let mut total_station_wait = 0
   let mut total_station_dequeues = 0
