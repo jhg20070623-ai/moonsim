@@ -104,6 +104,42 @@ test "simulation rejects scheduling and running into the past" {
 }
 
 ///|
+test "resource capacity and utilization are tracked over time" {
+  let resource = @moonsim.Resource::new("press", 2).unwrap()
+  assert_eq(resource.name(), "press")
+  assert_eq(resource.capacity(), 2)
+  assert_true(resource.acquire(1).unwrap())
+  assert_true(resource.acquire(2).unwrap())
+  assert_false(resource.acquire(3).unwrap())
+  assert_eq(resource.used(), 2)
+  assert_true(resource.release(4).unwrap())
+  assert_true(resource.release(5).unwrap())
+  assert_false(resource.release(6).unwrap())
+  assert_eq(resource.used(), 0)
+  assert_eq(resource.utilization_at(6).unwrap(), 0.5)
+}
+
+///|
+test "resource rejects invalid capacity and backwards time" {
+  match @moonsim.Resource::new("invalid", 0) {
+    Err(message) => assert_eq(message, "resource capacity must be positive")
+    Ok(_) => fail("zero-capacity resource was accepted")
+  }
+
+  let resource = @moonsim.Resource::new("lathe", 1).unwrap()
+  resource.acquire(5).unwrap() |> ignore
+  assert_eq(
+    resource.acquire(4),
+    Err("resource operation time cannot move backwards"),
+  )
+  assert_eq(resource.used(), 1)
+  assert_eq(
+    resource.utilization_at(4),
+    Err("resource utilization time cannot move backwards"),
+  )
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id

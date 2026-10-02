@@ -23,3 +23,11 @@
 - **Issue:** The scheduler relies on queue-owned insertion sequence values. The current event constructor remains public for low-level queue use; later APIs may narrow that surface.
 - **Validation:** Tests cover ID assignment, deterministic execution ordering, queue draining, `run_until` boundary semantics, and invalid time requests.
 - **Next:** Add reusable capacity-limited resources.
+
+## 2026-10-02 — Resource capacity model
+
+- **Implemented:** Named resources with positive capacity, multi-unit acquire/release, time-weighted busy-unit accounting, and utilization queries.
+- **Design:** Failed capacity requests and releases at zero do not change usage; elapsed busy time is still accounted through the attempted operation time.
+- **Issue:** Resource operations receive simulation time explicitly so the resource stays independent of the scheduler.
+- **Validation:** Tests cover capacity greater than one, full-resource rejection, under-release rejection, utilization, invalid capacity, and backwards timestamps.
+- **Next:** Add a FIFO queue with waiting-time statistics.
