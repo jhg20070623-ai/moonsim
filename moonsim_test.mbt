@@ -25,3 +25,33 @@ test "event validates time and preserves its action" {
     Ok(_) => fail("negative event time was accepted")
   }
 }
+
+///|
+test "event queue orders by time, priority, and stable sequence" {
+  let queue = @moonsim.EventQueue::new()
+  queue.push(@moonsim.Event::new(3, 2, 0, 0, fn() {  }).unwrap())
+  queue.push(@moonsim.Event::new(2, 1, 2, 1, fn() {  }).unwrap())
+  queue.push(@moonsim.Event::new(1, 1, 0, 2, fn() {  }).unwrap())
+  queue.push(@moonsim.Event::new(4, 1, 0, 3, fn() {  }).unwrap())
+  queue.push(@moonsim.Event::new(5, 1, -1, 4, fn() {  }).unwrap())
+
+  assert_eq(queue.length(), 5)
+  assert_eq(pop_event_id(queue), 5)
+  assert_eq(pop_event_id(queue), 1)
+  assert_eq(pop_event_id(queue), 4)
+  assert_eq(pop_event_id(queue), 2)
+  assert_eq(pop_event_id(queue), 3)
+  assert_true(queue.is_empty())
+  match queue.pop() {
+    None => ()
+    Some(_) => fail("an empty queue returned an event")
+  }
+}
+
+///|
+fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
+  match queue.pop() {
+    Some(event) => event.id
+    None => fail("expected a queued event")
+  }
+}

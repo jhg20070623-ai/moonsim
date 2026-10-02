@@ -2,7 +2,7 @@
 
 MoonSim is a lightweight and reproducible discrete-event simulation engine written in MoonBit.
 
-MoonSim targets manufacturing, logistics, queueing, and process simulation. Its first increment establishes a monotonic integer-tick simulation clock and validated event actions; scheduler, resources, queues, routing, batching, seeded randomness, and metrics will be added as tested milestones.
+MoonSim targets manufacturing, logistics, queueing, and process simulation. The current core provides a monotonic integer-tick simulation clock, validated event actions, and a stable priority event queue. The run loop, resources, queues, routing, batching, seeded randomness, and metrics will be added as tested milestones.
 
 ## Development status
 

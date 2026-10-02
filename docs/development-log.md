@@ -7,3 +7,11 @@
 - **Issue:** The official installer initially could not detect the environment architecture because `PROCESSOR_ARCHITECTURE` was unset. The runtime reported X64, so the installer was rerun with a matching process-local `AMD64` value.
 - **Validation:** `moon check` and `moon test` are being run against this increment.
 - **Next:** Add deterministic priority ordering and a reusable event queue.
+
+## 2026-10-02 — Deterministic priority event queue
+
+- **Implemented:** A binary min-heap event queue ordered by integer time, lower numeric priority, insertion sequence, and event ID as a final tie-breaker.
+- **Design:** The heap is implemented in MoonBit with no external dependency. The sequence key preserves FIFO order for otherwise equal events.
+- **Issue:** The official core includes a priority queue, but its generic comparison interface is unnecessary for closures stored in events; a focused heap avoids imposing comparison traits on callbacks.
+- **Validation:** A test checks mixed timestamps/priorities and FIFO ordering for same-time same-priority events.
+- **Next:** Add the simulation scheduler and run loop.
