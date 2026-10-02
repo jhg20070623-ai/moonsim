@@ -12,6 +12,10 @@ This repository is at the start of development. The current API is intentionally
 
 Simulation time uses integer ticks, and event ordering uses timestamp, priority, insertion sequence, and event ID. Use `Simulation::with_seed(seed)` for a repeatable random stream. See [reproducibility notes](docs/reproducibility.md) for the exact guarantee.
 
+## Examples
+
+- [Basic queue](examples/basic_queue/README.md): arrivals, FIFO waiting, one capacity-limited machine, service completion, and collected metrics.
+
 ## Build and test
 
 Install the MoonBit toolchain from [moonbitlang.com](https://www.moonbitlang.com/download), then run from the repository root:

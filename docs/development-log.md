@@ -80,3 +80,11 @@
 - **Issue:** Metrics are opt-in and must be updated by model actions; this keeps the engine from fabricating measurements.
 - **Validation:** Tests verify formulas with hand-computable observations and ensure invalid counts/timestamps do not corrupt collector state.
 - **Next:** Add the basic queue example using only current engine APIs.
+
+## 2026-10-02 — Basic queue example
+
+- **Implemented:** A runnable arrival/queue/resource/service/leave model with five entities and a single-server resource.
+- **Design:** The example schedules actual service-completion events and updates queue and metrics state from event actions; displayed values are produced by the model.
+- **Issue:** The core exposes composable pieces rather than a built-in entity process DSL, so the example uses small helper functions to wire events.
+- **Validation:** `moon run examples/basic_queue` completed ten events; the example README records that observed output and its inputs.
+- **Next:** Add a generic seven-station manufacturing line example.
