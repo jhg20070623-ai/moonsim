@@ -140,6 +140,60 @@ test "resource rejects invalid capacity and backwards time" {
 }
 
 ///|
+test "FIFO queue preserves order and records waiting time" {
+  let queue : @moonsim.Queue[String] = @moonsim.Queue::new()
+  queue.enqueue("first", 0).unwrap()
+  queue.enqueue("second", 2).unwrap()
+  queue.enqueue("third", 3).unwrap()
+
+  assert_eq(queue.length(), 3)
+  assert_eq(queue.dequeue(4).unwrap(), Some("first"))
+  assert_eq(queue.dequeue(6).unwrap(), Some("second"))
+  assert_eq(queue.length(), 1)
+  assert_eq(queue.total_waiting_time(), 8)
+  assert_eq(queue.dequeued_count(), 2)
+  assert_eq(queue.average_waiting_time(), 4.0)
+  assert_eq(queue.dequeue(7).unwrap(), Some("third"))
+  assert_eq(queue.dequeue(8).unwrap(), None)
+  assert_eq(queue.average_waiting_time(), 4.0)
+}
+
+///|
+test "FIFO queue rejects backwards timestamps" {
+  let queue : @moonsim.Queue[Int] = @moonsim.Queue::new()
+  queue.enqueue(1, 5).unwrap()
+  assert_eq(
+    queue.enqueue(2, 4),
+    Err("queue operation time cannot move backwards"),
+  )
+  assert_eq(queue.dequeue(4), Err("queue operation time cannot move backwards"))
+  assert_eq(queue.length(), 1)
+}
+
+///|
+test "FIFO queue compaction preserves remaining items" {
+  let queue : @moonsim.Queue[Int] = @moonsim.Queue::new()
+  let mut index = 0
+  while index < 100 {
+    queue.enqueue(index, index).unwrap()
+    index += 1
+  }
+
+  index = 0
+  while index < 70 {
+    assert_eq(queue.dequeue(100).unwrap(), Some(index))
+    index += 1
+  }
+  assert_eq(queue.length(), 30)
+
+  while index < 100 {
+    assert_eq(queue.dequeue(100).unwrap(), Some(index))
+    index += 1
+  }
+  assert_eq(queue.length(), 0)
+}
+
+///|
 fn pop_event_id(queue : @moonsim.EventQueue) -> Int raise Error {
   match queue.pop() {
     Some(event) => event.id

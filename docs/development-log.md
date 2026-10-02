@@ -31,3 +31,11 @@
 - **Issue:** Resource operations receive simulation time explicitly so the resource stays independent of the scheduler.
 - **Validation:** Tests cover capacity greater than one, full-resource rejection, under-release rejection, utilization, invalid capacity, and backwards timestamps.
 - **Next:** Add a FIFO queue with waiting-time statistics.
+
+## 2026-10-02 — FIFO queue and waiting statistics
+
+- **Implemented:** Generic FIFO enqueue/dequeue, queue length, total/mean waiting time, and successful dequeue count.
+- **Design:** Queue operations take explicit integer simulation time and reject time reversal. Wait statistics include only items that were actually removed; an empty dequeue does not affect them.
+- **Issue:** A head cursor avoids shifting on each removal; consumed storage is cleared or compacted to prevent indefinite retention of old entries.
+- **Validation:** Tests cover FIFO behavior, waiting time totals and averages, empty dequeue, and timestamp reversal.
+- **Next:** Add entities and reusable process routes.
