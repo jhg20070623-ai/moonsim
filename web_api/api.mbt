@@ -9,6 +9,18 @@ pub struct ScenarioRequest {
 pub extend ScenarioRequest with FromJson::{from_json}
 
 ///|
+/// Request payload for an experiment replication run.
+pub struct ExperimentRequest {
+  scenario : String
+  seed : Int
+  runs : Int
+  parameters : Json
+} derive(FromJson)
+
+///|
+pub extend ExperimentRequest with FromJson::{from_json}
+
+///|
 pub struct ApiResponse {
   ok : Bool
   result : Json
@@ -17,6 +29,13 @@ pub struct ApiResponse {
 
 ///|
 pub extend ApiResponse with ToJson::{to_json}
+
+///|
+/// Browser-facing bounds, justified by docs/browser-limits.md.
+const MAX_BROWSER_ENTITIES : Int = 10000
+
+///|
+const MAX_BROWSER_RUNS : Int = 20
 
 ///|
 #export_name("run_scenario_json")
@@ -44,23 +63,125 @@ pub fn run_scenario_json(input_json : String) -> String {
             error: Json::string(message),
           }
         Ok(config) =>
-          match @scenarios.run_scenario(config) {
+          match validate_browser_entity_count(config) {
             Err(message) =>
               ApiResponse::{
                 ok: false,
                 result: Json::null(),
                 error: Json::string(message),
               }
-            Ok(result) =>
-              ApiResponse::{
-                ok: true,
-                result: @json.to_json(result),
-                error: Json::null(),
+            Ok(_) =>
+              match @scenarios.run_scenario(config) {
+                Err(message) =>
+                  ApiResponse::{
+                    ok: false,
+                    result: Json::null(),
+                    error: Json::string(message),
+                  }
+                Ok(result) =>
+                  ApiResponse::{
+                    ok: true,
+                    result: @json.to_json(result),
+                    error: Json::null(),
+                  }
               }
           }
       }
   }
   @json.to_json(response).stringify()
+}
+
+///|
+#export_name("run_experiment_json")
+pub fn run_experiment_json(input_json : String) -> String {
+  let request : Result[ExperimentRequest, String] = try {
+    let parsed = @json.parse(input_json)
+    let request : ExperimentRequest = @json.from_json(parsed)
+    Ok(request)
+  } catch {
+    _ =>
+      Err(
+        "request must be valid JSON with scenario, seed, runs, and parameters",
+      )
+  }
+  let response = match request {
+    Err(message) =>
+      ApiResponse::{
+        ok: false,
+        result: Json::null(),
+        error: Json::string(message),
+      }
+    Ok(request) =>
+      match
+        scenario_config(ScenarioRequest::{
+          scenario: request.scenario,
+          seed: request.seed,
+          parameters: request.parameters,
+        }) {
+        Err(message) =>
+          ApiResponse::{
+            ok: false,
+            result: Json::null(),
+            error: Json::string(message),
+          }
+        Ok(config) =>
+          match validate_browser_entity_count(config) {
+            Err(message) =>
+              ApiResponse::{
+                ok: false,
+                result: Json::null(),
+                error: Json::string(message),
+              }
+            Ok(_) =>
+              if request.runs > MAX_BROWSER_RUNS {
+                ApiResponse::{
+                  ok: false,
+                  result: Json::null(),
+                  error: Json::string(
+                    "runs exceeds the measured browser limit of 20",
+                  ),
+                }
+              } else {
+                match
+                  @scenarios.ExperimentRunner::new(request.seed, request.runs) {
+                  Err(message) =>
+                    ApiResponse::{
+                      ok: false,
+                      result: Json::null(),
+                      error: Json::string(message),
+                    }
+                  Ok(runner) =>
+                    match runner.run(config) {
+                      Err(message) =>
+                        ApiResponse::{
+                          ok: false,
+                          result: Json::null(),
+                          error: Json::string(message),
+                        }
+                      Ok(result) =>
+                        ApiResponse::{
+                          ok: true,
+                          result: @json.to_json(result),
+                          error: Json::null(),
+                        }
+                    }
+                }
+              }
+          }
+      }
+  }
+  @json.to_json(response).stringify()
+}
+
+///|
+fn validate_browser_entity_count(
+  config : @scenarios.ScenarioConfig,
+) -> Result[Unit, String] {
+  if @scenarios.scenario_entity_count(config) > MAX_BROWSER_ENTITIES {
+    Err("entity_count exceeds the measured browser limit of 10000")
+  } else {
+    Ok(())
+  }
 }
 
 ///|

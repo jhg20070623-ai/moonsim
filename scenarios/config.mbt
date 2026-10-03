@@ -184,6 +184,16 @@ pub fn ScenarioConfig::logistics_batching(
 }
 
 ///|
+/// Returns the entity count requested by a scenario.
+pub fn scenario_entity_count(config : ScenarioConfig) -> Int {
+  match config {
+    BasicQueue(parameters, _) => parameters.entity_count
+    ManufacturingLine(parameters, _) => parameters.entity_count
+    LogisticsBatching(parameters, _) => parameters.entity_count
+  }
+}
+
+///|
 /// Returns the standard five-entity FIFO queue preset.
 pub fn ScenarioConfig::basic_queue_preset() -> ScenarioConfig {
   ScenarioConfig::basic_queue(

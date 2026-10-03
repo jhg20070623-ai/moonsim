@@ -117,3 +117,79 @@ test "Web API applies the request seed and entity count" {
   assert_true(is_number(response_field(result, "seed"), 99.0))
   assert_true(is_number(response_field(result, "completed"), 2.0))
 }
+
+///|
+test "Web API returns real metrics for repeated experiment runs" {
+  let response = response_json_from(
+    run_experiment_json(
+      "{\"scenario\":\"basic_queue\",\"seed\":11,\"runs\":3,\"parameters\":{\"entity_count\":2,\"arrival_interval\":3,\"arrival_times\":[],\"service_time\":1,\"resource_capacity\":1}}",
+    ),
+  )
+  assert_true(response_field(response, "ok") is Json::True)
+  let result = response_field(response, "result")
+  assert_true(is_number(response_field(result, "base_seed"), 11.0))
+  assert_true(is_number(response_field(result, "run_count"), 3.0))
+  match response_field(result, "waiting_time") {
+    Json::Object(summary) => {
+      assert_true(summary.get("mean") is Some(_))
+      assert_true(summary.get("min") is Some(_))
+      assert_true(summary.get("max") is Some(_))
+    }
+    _ => fail("experiment metric summary is not an object")
+  }
+}
+
+///|
+test "Web API rejects an invalid experiment run count" {
+  let response = response_json_from(
+    run_experiment_json(
+      "{\"scenario\":\"basic_queue\",\"seed\":11,\"runs\":0,\"parameters\":{\"entity_count\":2,\"arrival_interval\":3,\"arrival_times\":[],\"service_time\":1,\"resource_capacity\":1}}",
+    ),
+  )
+  assert_true(response_field(response, "ok") is Json::False)
+  assert_true(response_field(response, "error") is Json::String(_))
+}
+
+///|
+test "Web API validates the complete experiment request envelope" {
+  let response = response_json_from(
+    run_experiment_json(
+      "{\"scenario\":\"basic_queue\",\"seed\":11,\"parameters\":{}}",
+    ),
+  )
+  assert_true(response_field(response, "ok") is Json::False)
+  assert_true(response_field(response, "error") is Json::String(_))
+}
+
+///|
+test "Web API rejects a scenario above the measured browser entity limit" {
+  let response = response_json(
+    "{\"scenario\":\"basic_queue\",\"seed\":1,\"parameters\":{\"entity_count\":10001,\"arrival_interval\":1,\"arrival_times\":[],\"service_time\":1,\"resource_capacity\":1}}",
+  )
+  assert_true(response_field(response, "ok") is Json::False)
+  assert_eq(
+    response_field(response, "error"),
+    Json::string("entity_count exceeds the measured browser limit of 10000"),
+  )
+}
+
+///|
+test "Web API rejects experiments above the measured browser run limit" {
+  let response = response_json_from(
+    run_experiment_json(
+      "{\"scenario\":\"basic_queue\",\"seed\":1,\"runs\":21,\"parameters\":{\"entity_count\":1,\"arrival_interval\":1,\"arrival_times\":[],\"service_time\":1,\"resource_capacity\":1}}",
+    ),
+  )
+  assert_true(response_field(response, "ok") is Json::False)
+  assert_eq(
+    response_field(response, "error"),
+    Json::string("runs exceeds the measured browser limit of 20"),
+  )
+}
+
+///|
+fn response_json_from(output : String) -> Json raise {
+  @json.parse(output) catch {
+    _ => fail("Web API returned invalid JSON")
+  }
+}

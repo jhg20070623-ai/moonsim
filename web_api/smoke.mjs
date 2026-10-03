@@ -33,6 +33,21 @@ assert.equal(
 assert.equal(response.result.wip, 0, "scenario should drain its WIP");
 assert.ok(response.result.throughput > 0, "result should include throughput");
 
+const experimentInput = { ...input, seed: 7, runs: 2 };
+const experiment = JSON.parse(
+  api.run_experiment_json(JSON.stringify(experimentInput)),
+);
+assert.equal(experiment.ok, true, "valid experiment should succeed");
+assert.equal(experiment.result.run_count, experimentInput.runs);
+assert.equal(experiment.result.completed.mean, experimentInput.parameters.entity_count);
+assert.ok(experiment.result.waiting_time.min >= 0);
+assert.ok(
+  experiment.result.waiting_time.min <= experiment.result.waiting_time.mean,
+);
+assert.ok(
+  experiment.result.waiting_time.mean <= experiment.result.waiting_time.max,
+);
+
 const invalidOutput = api.run_scenario_json("{");
 const invalidResponse = JSON.parse(invalidOutput);
 assert.equal(invalidResponse.ok, false, "invalid JSON should return an error");
