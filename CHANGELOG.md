@@ -2,6 +2,15 @@
 
 Notable project changes are recorded here.
 
+## v0.2.1 — 2026-10-03
+
+- Add Playwright end-to-end coverage for Basic Queue, Manufacturing Line, Logistics Batching, Experiment Runner, JSON downloads, changed inputs, and the responsive Web Lab layout.
+- Compare deterministic manufacturing outputs in Edge, Chromium, and Firefox; run Chromium as a required CI check and Firefox as a separate advisory job.
+- Add real browser screenshots and an under-10-MiB Web Lab demo GIF.
+- Improve keyboard focus visibility and respect reduced-motion preferences.
+- Update CI to current stable GitHub Actions majors and pin the runner to Ubuntu 26.04; document the runtime decisions.
+- Add browser compatibility results, release readiness, and a short internal demo script.
+
 ## v0.2.0 — 2026-10-03
 
 - Add typed, parameterized runners and structured JSON results for Basic Queue, Manufacturing Line, and Logistics Batching.

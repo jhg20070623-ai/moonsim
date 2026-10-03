@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-10-03 — v0.2.1 browser and release hardening
+
+- **Browser regression coverage:** Added Playwright scenarios for Basic Queue, three-seed Experiment Runner, Manufacturing Line, Logistics Batching, JSON export, responsive width, and edited-input reruns. Stable `data-testid` hooks identify tested UI controls and results.
+- **Cross-browser results:** Local Edge 154.0.4258.48, Chromium 153.0.8010.12, and Firefox 155.0 all passed the scenarios. The default manufacturing model matched across browsers for completion, WIP, and utilization; floating metrics matched within `1e-9`. Exact environment and scope are in `docs/browser-compatibility.md`.
+- **CI:** Required Chromium browser E2E is separate from the Firefox advisory job, so a Firefox-only issue cannot block main validation or Pages deployment. Action versions and the explicit Ubuntu 26.04 runner are documented in `docs/ci-runtime-notes.md`.
+- **Showcase:** Added captured Web Lab screenshots, a short actual-browser GIF, focus styles, reduced-motion support, and current version and documentation links in the page footer. The page identifies itself as v0.2.1.
+- **Documentation:** Updated README, roadmap, and changelog; added an internal 60–90 second demo script and a scoped v0.2.1 release-readiness report.
+- **Local validation:** `moon fmt`, `moon check`, and `moon test` passed (62 tests); all three CLI examples, the MoonBit JavaScript build/API smoke, static Web Lab build/smoke, Node syntax checks, and `npm ci` passed. Playwright E2E passed in Edge, Chromium, and Firefox; deterministic manufacturing comparisons passed within `1e-9`.
+- **Public CI:** Push run [#37132359689](https://github.com/jhg20070623-ai/moonsim/actions/runs/37132359689) and PR run [#37132381221](https://github.com/jhg20070623-ai/moonsim/actions/runs/37132381221) passed validation, examples, Chromium E2E, and advisory Firefox E2E.
+- **Publication state:** The feature branch started at the fetched `origin/main` commit `892de2f`. PR [#2](https://github.com/jhg20070623-ai/moonsim/pull/2) is awaiting merge; the main-branch Pages deployment is still required. No `v0.2.1` tag or GitHub Release has been created yet.
+
 ## 2026-10-03 — MoonSim Web Lab v0.2.0
 
 - **Experiment Runner:** Added independent replications using consecutive seeds from a user-selected base seed. The MoonBit summary reports mean, minimum, and maximum completed count, cycle time, waiting time, throughput, and average WIP; it does not claim inferential statistics.

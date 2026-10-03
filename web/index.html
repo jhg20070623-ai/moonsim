@@ -34,47 +34,47 @@
           </div>
 
           <div class="field-label scenario-label">Scenario</div>
-          <div class="scenario-picker" role="group" aria-label="Choose a simulation scenario">
-            <button type="button" class="scenario-choice active" data-scenario="basic_queue" aria-pressed="true"><span class="choice-icon">↕</span><span><strong>Basic Queue</strong><small>One service resource</small></span></button>
-            <button type="button" class="scenario-choice" data-scenario="manufacturing_line" aria-pressed="false"><span class="choice-icon">▥</span><span><strong>Manufacturing Line</strong><small>Seven processing stations</small></span></button>
-            <button type="button" class="scenario-choice" data-scenario="logistics_batching" aria-pressed="false"><span class="choice-icon">▤</span><span><strong>Logistics Batching</strong><small>Compare release policies</small></span></button>
+          <div class="scenario-picker" role="group" aria-label="Choose a simulation scenario" data-testid="scenario-selector">
+            <button type="button" class="scenario-choice active" data-testid="scenario-basic_queue" data-scenario="basic_queue" aria-pressed="true"><span class="choice-icon">↕</span><span><strong>Basic Queue</strong><small>One service resource</small></span></button>
+            <button type="button" class="scenario-choice" data-testid="scenario-manufacturing_line" data-scenario="manufacturing_line" aria-pressed="false"><span class="choice-icon">▥</span><span><strong>Manufacturing Line</strong><small>Seven processing stations</small></span></button>
+            <button type="button" class="scenario-choice" data-testid="scenario-logistics_batching" data-scenario="logistics_batching" aria-pressed="false"><span class="choice-icon">▤</span><span><strong>Logistics Batching</strong><small>Compare release policies</small></span></button>
           </div>
 
           <form id="scenario-form" novalidate>
             <div id="parameter-fields" class="parameter-fields"></div>
             <div class="common-fields">
-              <label class="form-field"><span>Seed <span class="hint">same seed, same result</span></span><input id="seed" name="seed" type="number" min="0" max="2147483647" step="1" value="42" required></label>
-              <label class="form-field" id="runs-field"><span>Replications <span class="hint">successive seeds</span></span><input id="runs" name="runs" type="number" min="1" max="20" step="1" value="1" required></label>
+              <label class="form-field"><span>Seed <span class="hint">same seed, same result</span></span><input id="seed" data-testid="param-seed" name="seed" type="number" min="0" max="2147483647" step="1" value="42" required></label>
+              <label class="form-field" id="runs-field"><span>Replications <span class="hint">successive seeds</span></span><input id="runs" data-testid="param-runs" name="runs" type="number" min="1" max="20" step="1" value="1" required></label>
             </div>
             <p id="form-note" class="form-note">Maximum 10,000 entities and 20 replications, based on the documented browser benchmark.</p>
             <div class="form-actions">
-              <button id="run-button" class="button button-primary" type="submit"><span>Run simulation</span><span aria-hidden="true">→</span></button>
+              <button id="run-button" class="button button-primary" data-testid="run-button" type="submit"><span>Run Simulation</span><span aria-hidden="true">→</span></button>
               <button id="reset-button" class="button button-quiet" type="button">Reset preset</button>
             </div>
           </form>
-          <div id="error-message" class="error-message" role="alert" hidden></div>
+          <div id="error-message" class="error-message" data-testid="error-message" role="alert" hidden></div>
         </aside>
 
         <section class="results-column" aria-live="polite">
           <div class="results-heading">
             <div><p class="eyebrow">MODEL OUTPUT</p><h2>Simulation results</h2></div>
-            <button id="download-button" class="button button-outline" type="button" disabled><span aria-hidden="true">↓</span> Download JSON</button>
+            <button id="download-button" class="button button-outline" data-testid="download-json" type="button" disabled><span aria-hidden="true">↓</span> Download JSON</button>
           </div>
           <div id="empty-state" class="empty-state panel">
             <div class="empty-art" aria-hidden="true"><span class="art-line art-line-a"></span><span class="art-line art-line-b"></span><span class="art-node node-a"></span><span class="art-node node-b"></span><span class="art-node node-c"></span></div>
             <div><p class="eyebrow">READY WHEN YOU ARE</p><h3>Your model has not run yet</h3><p>Choose a scenario and adjust its parameters. Results and charts will appear here.</p></div>
           </div>
           <div id="result-view" hidden>
-            <div id="run-summary" class="run-summary"></div>
-            <div id="kpi-grid" class="kpi-grid"></div>
-            <div id="visualizations" class="visualizations"></div>
+            <div id="run-summary" class="run-summary" data-testid="run-summary"></div>
+            <div id="kpi-grid" class="kpi-grid" data-testid="kpi-grid"></div>
+            <div id="visualizations" class="visualizations" data-testid="visualizations"></div>
             <p class="result-footnote">Metrics below are returned by the MoonSim engine. Experiment values show mean with observed min–max across seeds.</p>
           </div>
-          <div id="running-state" class="running-state panel" hidden><span class="spinner" aria-hidden="true"></span><div><strong>Running in a background worker</strong><p>The page stays responsive while MoonSim calculates the requested scenario.</p></div></div>
+          <div id="running-state" class="running-state panel" data-testid="running-state" hidden><span class="spinner" aria-hidden="true"></span><div><strong>Running in a background worker</strong><p>The page stays responsive while MoonSim calculates the requested scenario.</p></div></div>
         </section>
       </div>
 
-      <footer class="page-footer"><span>MoonSim v0.2 · MoonBit simulation engine</span><a href="https://github.com/jhg20070623-ai/moonsim/blob/main/docs/browser-limits.md">Browser limits and benchmark</a><a href="https://github.com/jhg20070623-ai/moonsim/blob/main/LICENSE">Apache-2.0</a></footer>
+      <footer class="page-footer"><span>MoonSim v0.2.1 · MoonBit simulation engine</span><a href="https://github.com/jhg20070623-ai/moonsim">GitHub</a><a href="https://github.com/jhg20070623-ai/moonsim/blob/main/README.md">Documentation</a><a href="https://github.com/jhg20070623-ai/moonsim/blob/main/docs/browser-limits.md">Browser limits and benchmark</a><a href="https://github.com/jhg20070623-ai/moonsim/blob/main/LICENSE">Apache-2.0</a></footer>
     </main>
   </body>
 </html>
