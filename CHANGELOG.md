@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased
+Notable project changes are recorded here.
+
+## Unreleased — v0.2.0 work
+
+- Add typed, parameterized runners and structured JSON results for Basic Queue, Manufacturing Line, and Logistics Batching.
+- Add consecutive-seed ExperimentRunner summaries with mean, minimum, and maximum metrics.
+- Add browser JSON exports, a Worker-based MoonSim Web Lab, resource and logistics comparison charts, and JSON result downloads.
+- Add measured browser bounds, browser/static package smoke checks, and a GitHub Pages deployment job gated on successful CI validation.
+
+## v0.1.0
 
 - Add a runnable seven-station manufacturing line with computed flow metrics.
 - Add architecture, roadmap, and historical case-study background documentation.

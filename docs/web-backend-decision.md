@@ -24,7 +24,7 @@ Local checks on the current toolchain found:
 
 The first browser API is a narrow JSON-in/JSON-out boundary. The JavaScript backend is the smallest verified host interface for that boundary and avoids adding a custom string allocator, encoding protocol, or runtime glue solely for JSON exchange. This decision is based on a local interop probe, not on a claim that MoonBit's Wasm backends cannot run in browsers.
 
-Only the adapter package targets JavaScript. The reusable simulation and scenario logic remain MoonBit code and are invoked by the generated MoonBit module. Revisit Wasm or Wasm GC if the project later adopts a documented, tested string ABI that removes the current host-boundary friction.
+Only the adapter package targets JavaScript. The reusable simulation and scenario logic remain MoonBit code and are invoked by the generated MoonBit module. The Web Lab now calls that module from a browser Worker; its HTML/CSS/JavaScript code handles input, presentation, and JSON transport only. Revisit Wasm or Wasm GC if the project later adopts a documented, tested string ABI that removes the current host-boundary friction.
 
 ## Build command
 
@@ -34,4 +34,4 @@ From the repository root, build the browser adapter with the current Moon CLI sy
 moon build --target js web_api
 ```
 
-The local toolchain help lists `wasm`, `wasm-gc`, and `js` as valid `--target` values. Node validates the exported JSON API; browser UI integration and static hosting remain later implementation and verification steps.
+The local toolchain help lists `wasm`, `wasm-gc`, and `js` as valid `--target` values. Node validates the exported JSON API and packaged static site. A local Edge browser smoke test covers Worker execution, the experiment summary, both chart paths, and result download. The MoonBit CI workflow has a Pages deployment job that runs only after validation succeeds on `main`.

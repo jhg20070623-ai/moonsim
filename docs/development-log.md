@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-10-03 — MoonSim Web Lab and v0.2 work in progress
+
+- **Experiment Runner:** Added independent replications using consecutive seeds from a user-selected base seed. The MoonBit summary reports mean, minimum, and maximum completed count, cycle time, waiting time, throughput, and average WIP; it does not claim inferential statistics.
+- **Browser request bounds:** The MoonBit JSON adapter rejects more than 10,000 entities per run or more than 20 replications. Limits were selected after a warmed Microsoft Edge benchmark and are recorded in `docs/browser-limits.md`.
+- **Web Lab:** Added a plain HTML/CSS/JavaScript page using the MoonBit JSON exports in a module Worker. It provides the three existing scenario models, editable parameters, KPI cards, seven-station utilization bars, fixed-time/fixed-batch/hybrid comparison charts, replication summaries, validation feedback, and JSON export.
+- **Static packaging and CI:** `scripts/build-web.mjs` packages the generated MoonBit JavaScript module with the page. CI now builds and smoke-checks this static output; a dependent Pages deployment job is configured for validated pushes to `main`.
+- **Browser validation:** A real Edge browser smoke run exercised the Worker API, three-seed replication, all seven utilization bars, all three logistics policies and charts, and downloaded result JSON.
+- **Local validation:** `moon fmt`, `moon check`, and `moon test` passed; 62 tests passed. The JavaScript API smoke test, built-site smoke test, and Edge browser smoke passed. The three CLI examples are covered by the existing CI workflow and were rerun successfully.
+- **Release state:** This v0.2.0 work is on `feature/v0.2-web-lab`; the new changes are not yet pushed or deployed. The Pages workflow and public CI need to pass on the release commit before v0.2.0 can be tagged.
+
 ## 2026-10-03 · Acceptance hardening
 
 - **Metrics integration:** Added `Queue::dequeue_with_wait`, which returns the dequeued value with its measured queue wait. The existing `dequeue` API and Queue-level aggregates remain available. All three examples now record the same dequeue measurement in the shared Metrics collector.
