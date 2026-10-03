@@ -1,0 +1,4 @@
+import {
+  "jhg20070623-ai/moonsim" @sim,
+  "moonbitlang/core/json",
+}

@@ -2,7 +2,7 @@ name: MoonBit CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "feature/**"]
   pull_request:
   workflow_dispatch:
 
@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Install MoonBit
         shell: bash
         run: |
@@ -24,6 +27,21 @@ jobs:
           git diff --exit-code
       - name: Type check
         run: moon check
+      - name: Build browser JavaScript backend
+        run: moon build --target js web_api
+      - name: Smoke test browser API export
+        run: node web_api/smoke.mjs
+      - name: Build static Web Lab
+        run: node scripts/build-web.mjs
+      - name: Smoke test built Web Lab
+        run: node scripts/site-smoke.mjs
+      - name: Check browser JavaScript syntax
+        run: |
+          node --check web/app.js
+          node --check web/simulation-worker.js
+          node --check scripts/build-web.mjs
+          node --check scripts/site-smoke.mjs
+          node --check scripts/browser-smoke.mjs
       - name: Run tests
         run: moon test
       - name: Run examples
@@ -31,3 +49,40 @@ jobs:
           moon run examples/basic_queue
           moon run examples/manufacturing_line
           moon run examples/logistics_batching
+
+  deploy-pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s latest
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Build browser JavaScript backend
+        run: moon build --target js web_api
+      - name: Build static Web Lab
+        run: node scripts/build-web.mjs
+      - name: Smoke test deployed files
+        run: node scripts/site-smoke.mjs
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

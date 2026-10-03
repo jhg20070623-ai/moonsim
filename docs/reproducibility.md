@@ -18,3 +18,7 @@ Reproducibility also depends on keeping model inputs and event scheduling stable
 - Record the MoonBit toolchain and dependency versions with benchmark output.
 
 The random source is for simulation experiments. It is not exposed as a cryptographic security API.
+
+## Replication summaries
+
+`ExperimentRunner::new(base_seed, run_count)` creates one fresh scenario run for each seed from `base_seed` through `base_seed + run_count - 1`. The returned mean/min/max values are computed directly from those runs. They describe that finite seed range; they are not confidence intervals or statistical conclusions. Preserve the parameters, base seed, replication count, MoonSim revision, and MoonBit toolchain when sharing an exported result.

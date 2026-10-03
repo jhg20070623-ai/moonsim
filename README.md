@@ -14,13 +14,31 @@ MoonSim targets manufacturing, logistics, queueing, and process simulation. The 
 - Fixed-time, fixed-batch, and hybrid batch trigger policies.
 - Seeded random values and collection of cycle time, waiting time, WIP, throughput, and queue length.
 
-The package is under active development. It focuses on a small core that examples can compose; it does not provide a visual model editor or a built-in manufacturing workflow.
+The core stays composable; the Web Lab wraps three parameterized example models. It does not provide a graphical model editor or a workflow designer.
+
+## MoonSim Web Lab
+
+The browser lab lets you change queueing, manufacturing, and batching inputs, run the MoonBit scenarios, view returned KPIs, compare the three logistics release policies, and download the request and actual result as JSON. A seed can be repeated directly; the Experiment Runner summarizes consecutive seeded replications with mean and observed min/max. Browser work runs in a Web Worker.
+
+**Live demo:** [MoonSim Web Lab](https://jhg20070623-ai.github.io/moonsim/)
+
+The browser adapter limits each run to 10,000 entities and each experiment to 20 replications. The measurements and test machine are documented in [browser limits](docs/browser-limits.md).
 
 ## Quick start
 
 Create a simulation with @moonsim.Simulation::with_seed(42), schedule actions, and call run(). For a complete queueing model, run:
 
     moon run examples/basic_queue
+
+To build and serve the browser lab locally, build its MoonBit JavaScript module and static files, then serve the generated `site/` directory:
+
+```sh
+moon build --target js web_api
+node scripts/build-web.mjs
+python -m http.server 8000 --directory site
+```
+
+Open <http://localhost:8000>. GitHub Actions builds the same static package and deploys it to Pages from `main` after validation.
 
 ## Architecture
 
@@ -45,6 +63,10 @@ Install the MoonBit toolchain from [moonbitlang.com](https://www.moonbitlang.com
 moon fmt
 moon check
 moon test
+moon build --target js web_api
+node web_api/smoke.mjs
+node scripts/build-web.mjs
+node scripts/site-smoke.mjs
 moon run cmd/main
 ```
 

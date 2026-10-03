@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8">
+  <title>MoonSim browser benchmark</title>
+  <body>
+    <pre id="output">Running warmed browser benchmark…</pre>
+    <script type="module">
+      const output = document.querySelector("#output");
+      const round = (value) => Number(value.toFixed(2));
+      const median = (values) => {
+        const sorted = [...values].sort((left, right) => left - right);
+        const middle = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0
+          ? (sorted[middle - 1] + sorted[middle]) / 2
+          : sorted[middle];
+      };
+
+      function inputFor(scenario, entityCount) {
+        if (scenario === "basic_queue") {
+          return {
+            scenario,
+            seed: 42,
+            parameters: {
+              entity_count: entityCount,
+              arrival_interval: 0,
+              arrival_times: [],
+              service_time: 1,
+              resource_capacity: 1,
+            },
+          };
+        }
+        if (scenario === "manufacturing_line") {
+          return {
+            scenario,
+            seed: 42,
+            parameters: {
+              entity_count: entityCount,
+              arrival_interval: 6,
+              processing_times: [12, 8, 6, 10, 5, 4, 9],
+              station_capacities: [1, 1, 1, 1, 1, 1, 1],
+            },
+          };
+        }
+        return {
+          scenario: "logistics_batching",
+          seed: 42,
+          parameters: {
+            entity_count: entityCount,
+            arrival_times: Array.from({ length: entityCount }, (_, index) => index),
+            delivery_delay: 2,
+            policy_type: "fixed_batch",
+            fixed_time_threshold: 5,
+            fixed_batch_threshold: 3,
+            hybrid_batch_threshold: 3,
+            hybrid_timeout: 5,
+          },
+        };
+      }
+
+      async function measure(method, request, expectedCompleted, repeats = 5) {
+        const invoke = () => {
+          const raw = method(JSON.stringify(request));
+          const response = JSON.parse(raw);
+          if (!response.ok) throw new Error(response.error);
+          return response;
+        };
+        const warmupStart = performance.now();
+        const warmup = invoke();
+        const warmupMs = performance.now() - warmupStart;
+        if (expectedCompleted !== undefined) {
+          const completed = request.runs === undefined
+            ? warmup.result.completed
+            : warmup.result.completed.mean;
+          if (completed !== expectedCompleted) throw new Error("Warm-up returned the wrong completion count.");
+        }
+        const samples = [];
+        for (let index = 0; index < repeats; index += 1) {
+          const start = performance.now();
+          const response = invoke();
+          samples.push(performance.now() - start);
+          if (expectedCompleted !== undefined) {
+            const completed = request.runs === undefined
+              ? response.result.completed
+              : response.result.completed.mean;
+            if (completed !== expectedCompleted) throw new Error("Benchmark run returned the wrong completion count.");
+          }
+        }
+        return {
+          warmup_ms: round(warmupMs),
+          median_ms: round(median(samples)),
+          samples_ms: samples.map(round),
+        };
+      }
+
+      function measureLogisticsComparison(api, entityCount, repeats = 5) {
+        const policies = ["fixed_time", "fixed_batch", "hybrid"];
+        const requests = policies.map((policy) => ({
+          ...inputFor("logistics_batching", entityCount),
+          parameters: {
+            ...inputFor("logistics_batching", entityCount).parameters,
+            policy_type: policy,
+          },
+        }));
+        const invoke = () => {
+          for (const request of requests) {
+            const response = JSON.parse(api.run_scenario_json(JSON.stringify(request)));
+            if (!response.ok || response.result.completed !== entityCount) {
+              throw new Error(`Logistics comparison failed: ${response.error}`);
+            }
+          }
+        };
+        const warmupStart = performance.now();
+        invoke();
+        const warmupMs = performance.now() - warmupStart;
+        const samples = [];
+        for (let index = 0; index < repeats; index += 1) {
+          const start = performance.now();
+          invoke();
+          samples.push(performance.now() - start);
+        }
+        return {
+          policy_count: policies.length,
+          entity_count_per_policy: entityCount,
+          warmup_ms: round(warmupMs),
+          median_ms: round(median(samples)),
+          samples_ms: samples.map(round),
+        };
+      }
+
+      try {
+        const api = await import("/_build/js/debug/build/web_api/web_api.js");
+        const sizes = [100, 1000, 5000, 10000];
+        const scenarios = ["basic_queue", "manufacturing_line", "logistics_batching"];
+        const individualRuns = [];
+        for (const entityCount of sizes) {
+          for (const scenario of scenarios) {
+            const request = inputFor(scenario, entityCount);
+            const measured = await measure(api.run_scenario_json, request, entityCount);
+            individualRuns.push({ scenario, entity_count: entityCount, ...measured });
+          }
+        }
+        const experimentRequest = {
+          ...inputFor("manufacturing_line", 10000),
+          runs: 20,
+        };
+        const maxExperiment = await measure(
+          api.run_experiment_json,
+          experimentRequest,
+          10000,
+          3,
+        );
+        const logisticsComparison = measureLogisticsComparison(api, 10000);
+        output.textContent = JSON.stringify({
+          user_agent: navigator.userAgent,
+          hardware_concurrency: navigator.hardwareConcurrency,
+          warmup_runs: 1,
+          measured_repetitions: 5,
+          individual_runs: individualRuns,
+          maximum_experiment: {
+            scenario: experimentRequest.scenario,
+            entity_count: experimentRequest.parameters.entity_count,
+            runs: experimentRequest.runs,
+            ...maxExperiment,
+          },
+          maximum_logistics_policy_comparison: logisticsComparison,
+        }, null, 2);
+        document.title = "MoonSim browser benchmark complete";
+      } catch (error) {
+        output.textContent = JSON.stringify({ error: String(error), stack: error?.stack }, null, 2);
+        document.title = "MoonSim browser benchmark failed";
+      }
+    </script>
+  </body>
+</html>
