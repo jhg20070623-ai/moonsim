@@ -1,5 +1,5 @@
 import {
-  "jhg20070623-ai/moonsim",
+  "jhg20070623-ai/moonsim/scenarios",
 }
 
 pkgtype(kind: "executable")

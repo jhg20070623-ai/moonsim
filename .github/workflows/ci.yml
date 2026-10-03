@@ -2,7 +2,7 @@ name: MoonBit CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "feature/**"]
   pull_request:
   workflow_dispatch:
 
@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Install MoonBit
         shell: bash
         run: |
@@ -24,6 +27,10 @@ jobs:
           git diff --exit-code
       - name: Type check
         run: moon check
+      - name: Build browser JavaScript backend
+        run: moon build --target js web_api
+      - name: Smoke test browser API export
+        run: node web_api/smoke.mjs
       - name: Run tests
         run: moon test
       - name: Run examples
