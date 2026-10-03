@@ -69,12 +69,11 @@ fn start_service(
     let now = sim.now()
     machine.release(now).unwrap() |> ignore
     metrics.record_entity_completed(entity, now).unwrap() |> ignore
-    match queue.dequeue(now).unwrap() {
+    match queue.dequeue_with_wait(now).unwrap() {
       None =>
         metrics.record_queue_length(queue.length(), now).unwrap() |> ignore
-      Some(next) => {
-        metrics.record_waiting_time(now - next.created_at(), now).unwrap()
-        |> ignore
+      Some((next, waiting_time)) => {
+        metrics.record_waiting_time(waiting_time, now).unwrap() |> ignore
         metrics.record_queue_length(queue.length(), now).unwrap() |> ignore
         machine.acquire(now).unwrap() |> ignore
         start_service(sim, next, machine, queue, metrics, service_time)

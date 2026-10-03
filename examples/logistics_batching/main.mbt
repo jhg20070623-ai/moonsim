@@ -149,10 +149,9 @@ fn release_batch(
   state.batch_count += 1
   state.batch_open = false
   while state.queue.length() > 0 {
-    match state.queue.dequeue(released_at).unwrap() {
+    match state.queue.dequeue_with_wait(released_at).unwrap() {
       None => ()
-      Some(entity) => {
-        let waiting_time = released_at - entity.created_at()
+      Some((entity, waiting_time)) => {
         if waiting_time > max_wait {
           state.overdue_entities += 1
         }

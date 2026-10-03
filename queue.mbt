@@ -45,6 +45,20 @@ pub fn[T] Queue::enqueue(
 ///|
 /// Removes the oldest item and records its wait. Empty queues return None.
 pub fn[T] Queue::dequeue(self : Queue[T], now : Int) -> Result[T?, String] {
+  match self.dequeue_with_wait(now) {
+    Err(message) => Err(message)
+    Ok(None) => Ok(None)
+    Ok(Some((value, _))) => Ok(Some(value))
+  }
+}
+
+///|
+/// Removes the oldest item and returns it with its elapsed queue wait.
+/// Empty queues return None. The existing dequeue method remains available.
+pub fn[T] Queue::dequeue_with_wait(
+  self : Queue[T],
+  now : Int,
+) -> Result[(T, Int)?, String] {
   match self.record_time(now) {
     Err(message) => Err(message)
     Ok(_) =>
@@ -53,10 +67,11 @@ pub fn[T] Queue::dequeue(self : Queue[T], now : Int) -> Result[T?, String] {
       } else {
         let entry = self.entries[self.head]
         self.head += 1
-        self.total_waiting_time += now - entry.enqueued_at
+        let waiting_time = now - entry.enqueued_at
+        self.total_waiting_time += waiting_time
         self.dequeued_count += 1
         self.compact_if_needed()
-        Ok(Some(entry.value))
+        Ok(Some((entry.value, waiting_time)))
       }
   }
 }

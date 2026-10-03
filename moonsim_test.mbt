@@ -194,6 +194,35 @@ test "FIFO queue compaction preserves remaining items" {
 }
 
 ///|
+test "queue dequeue wait observations can be collected by metrics" {
+  let queue : @moonsim.Queue[Int] = @moonsim.Queue::new()
+  let metrics = @moonsim.Metrics::new(0).unwrap()
+  queue.enqueue(1, 0).unwrap()
+  queue.enqueue(2, 0).unwrap()
+
+  match queue.dequeue_with_wait(0).unwrap() {
+    None => fail("expected the first queued item")
+    Some((value, waiting_time)) => {
+      assert_eq(value, 1)
+      assert_eq(waiting_time, 0)
+      metrics.record_waiting_time(waiting_time, 0).unwrap()
+    }
+  }
+  match queue.dequeue_with_wait(4).unwrap() {
+    None => fail("expected the second queued item")
+    Some((value, waiting_time)) => {
+      assert_eq(value, 2)
+      assert_eq(waiting_time, 4)
+      metrics.record_waiting_time(waiting_time, 4).unwrap()
+    }
+  }
+
+  assert_eq(queue.total_waiting_time(), 4)
+  assert_eq(queue.average_waiting_time(), 2.0)
+  assert_eq(metrics.mean_waiting_time(), queue.average_waiting_time())
+}
+
+///|
 test "entity advances along reusable routes and tracks cycle time" {
   let route = @moonsim.Route::new(["cut", "drill", "pack"]).unwrap()
   let entity = @moonsim.Entity::new(42, 3).unwrap()
