@@ -9,7 +9,7 @@
 - **Documentation:** Updated README, roadmap, and changelog; added an internal 60–90 second demo script and a scoped v0.2.1 release-readiness report.
 - **Local validation:** `moon fmt`, `moon check`, and `moon test` passed (62 tests); all three CLI examples, the MoonBit JavaScript build/API smoke, static Web Lab build/smoke, Node syntax checks, and `npm ci` passed. Playwright E2E passed in Edge, Chromium, and Firefox; deterministic manufacturing comparisons passed within `1e-9`.
 - **Public CI:** Push run [#37132359689](https://github.com/jhg20070623-ai/moonsim/actions/runs/37132359689) and PR run [#37132381221](https://github.com/jhg20070623-ai/moonsim/actions/runs/37132381221) passed validation, examples, Chromium E2E, and advisory Firefox E2E.
-- **Publication state:** The feature branch started at the fetched `origin/main` commit `892de2f`. PR [#2](https://github.com/jhg20070623-ai/moonsim/pull/2) is awaiting merge; the main-branch Pages deployment is still required. No `v0.2.1` tag or GitHub Release has been created yet.
+- **Publication:** PR [#2](https://github.com/jhg20070623-ai/moonsim/pull/2) merged as `8497857`. Main run [#37133247347](https://github.com/jhg20070623-ai/moonsim/actions/runs/37133247347) passed validation, Chromium and Firefox E2E, and Pages deployment. The deployed public page returned HTTP 200 and identifies itself as v0.2.1. The annotated tag and GitHub Release follow the final readiness record and validation.
 
 ## 2026-10-03 — MoonSim Web Lab v0.2.0
 
