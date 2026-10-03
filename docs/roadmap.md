@@ -16,7 +16,7 @@ This roadmap describes work that is available in the repository today and a smal
 - `ExperimentRunner` with independent consecutive-seed replications and mean/min/max summaries.
 - MoonSim Web Lab with parameter controls, KPI output, manufacturing utilization bars, three-policy logistics charts, and JSON download.
 - Web simulations run in a Worker; browser API limits are 10,000 entities per run and 20 replications, based on the documented local benchmark.
-- Static Web Lab build and smoke checks pass in MoonBit CI. Feature-branch validation passed in [run #37126084668](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126084668); the Pages deployment job runs only after validation succeeds on `main`, so publication is pending PR #1.
+- Static Web Lab build and smoke checks pass in MoonBit CI. The validated main deployment is available at [MoonSim Web Lab](https://jhg20070623-ai.github.io/moonsim/); run [#37126484162](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126484162) completed both validation and Pages deployment.
 
 ## Next engineering steps
 

@@ -2,7 +2,7 @@
 
 Notable project changes are recorded here.
 
-## v0.2.0 — release candidate (2026-10-03)
+## v0.2.0 — 2026-10-03
 
 - Add typed, parameterized runners and structured JSON results for Basic Queue, Manufacturing Line, and Logistics Batching.
 - Add consecutive-seed ExperimentRunner summaries with mean, minimum, and maximum metrics.

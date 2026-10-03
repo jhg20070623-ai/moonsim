@@ -1,6 +1,6 @@
 # Development Log
 
-## 2026-10-03 — MoonSim Web Lab v0.2.0 candidate
+## 2026-10-03 — MoonSim Web Lab v0.2.0
 
 - **Experiment Runner:** Added independent replications using consecutive seeds from a user-selected base seed. The MoonBit summary reports mean, minimum, and maximum completed count, cycle time, waiting time, throughput, and average WIP; it does not claim inferential statistics.
 - **Browser request bounds:** The MoonBit JSON adapter rejects more than 10,000 entities per run or more than 20 replications. Limits were selected after a warmed Microsoft Edge benchmark and are recorded in `docs/browser-limits.md`.
@@ -8,8 +8,9 @@
 - **Static packaging and CI:** `scripts/build-web.mjs` packages the generated MoonBit JavaScript module with the page. CI builds and smoke-checks this static output; a dependent Pages deployment job is configured for validated pushes to `main`.
 - **Browser validation:** A real Edge browser smoke run exercised the Worker API, three-seed replication, all seven utilization bars, all three logistics policies and charts, and downloaded result JSON.
 - **Local validation:** `moon fmt`, `moon check`, and `moon test` passed; 62 tests passed. The JavaScript API smoke test, built-site smoke test, and Edge browser smoke passed. The three CLI examples were rerun successfully.
-- **Public validation:** [MoonBit CI run #37126084668](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126084668) passed the feature-branch validation job. Pull request [#1](https://github.com/jhg20070623-ai/moonsim/pull/1) also has a successful validation check in [run #37126121775](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126121775). The Pages job was skipped on the feature branch as configured; it still needs to succeed on `main` before release.
-- **Release state:** The v0.2.0 candidate and acceptance audit are under review in PR #1. Merge, main-branch CI, and Pages deployment remain pending; no v0.2.0 tag has been created.
+- **Public validation:** Feature-branch validation passed in [MoonBit CI run #37126084668](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126084668) and pull-request check [#37126121775](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126121775). PR [#1](https://github.com/jhg20070623-ai/moonsim/pull/1) merged as `0e90868`. Main validation passed in [run #37126484162](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126484162), as did its Pages deployment job.
+- **Pages setup:** The first deployment attempt found no Pages site configured. The repository Pages source was enabled for GitHub Actions, then the failed job was rerun successfully. The public page `https://jhg20070623-ai.github.io/moonsim/` returned HTTP 200.
+- **Release state:** The v0.2.0 implementation is merged and deployed. This release-readiness audit is being recorded before creating the v0.2.0 tag.
 
 ## 2026-10-03 · Acceptance hardening
 
