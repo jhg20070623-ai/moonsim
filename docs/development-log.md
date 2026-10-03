@@ -10,7 +10,7 @@
 - **Local validation:** `moon fmt`, `moon check`, and `moon test` passed; 62 tests passed. The JavaScript API smoke test, built-site smoke test, and Edge browser smoke passed. The three CLI examples were rerun successfully.
 - **Public validation:** Feature-branch validation passed in [MoonBit CI run #37126084668](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126084668) and pull-request check [#37126121775](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126121775). PR [#1](https://github.com/jhg20070623-ai/moonsim/pull/1) merged as `0e90868`. Main validation passed in [run #37126484162](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126484162), as did its Pages deployment job.
 - **Pages setup:** The first deployment attempt found no Pages site configured. The repository Pages source was enabled for GitHub Actions, then the failed job was rerun successfully. The public page `https://jhg20070623-ai.github.io/moonsim/` returned HTTP 200.
-- **Release state:** The v0.2.0 implementation is merged and deployed. This release-readiness audit is being recorded before creating the v0.2.0 tag.
+- **Release state:** The v0.2.0 implementation is merged and deployed. Annotated tag [`v0.2.0`](https://github.com/jhg20070623-ai/moonsim/releases/tag/v0.2.0) points to release commit `a59e75a`; the matching GitHub Release is published.
 
 ## 2026-10-03 · Acceptance hardening
 
