@@ -7,9 +7,26 @@ struct BatchState {
   mut batch_open : Bool
   mut generation : Int
   mut batch_count : Int
+  mut quantity_releases : Int
   mut timeout_releases : Int
   mut forced_partial_batches : Int
   mut overdue_entities : Int
+}
+
+///|
+struct BatchSummary {
+  completed_count : Int
+  final_wip : Int
+  final_queue_length : Int
+  batch_count : Int
+  mean_waiting_time : Double
+  throughput : Double
+  quantity_releases : Int
+  timeout_releases : Int
+  forced_partial_batches : Int
+  overdue_entities : Int
+  events_processed : Int
+  simulation_time : Int
 }
 
 ///|
@@ -24,6 +41,21 @@ fn main raise {
 
 ///|
 fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit raise {
+  let result = simulate_policy(policy)
+  println("Policy: \{label}")
+  println("  Entities completed: \{result.completed_count}")
+  println("  Batches released: \{result.batch_count}")
+  println("  Mean waiting time: \{result.mean_waiting_time} ticks")
+  println("  Throughput: \{result.throughput} entities/tick")
+  println("  Timeout releases: \{result.timeout_releases}")
+  println("  Overdue entities (> 5 ticks): \{result.overdue_entities}")
+  println("  End-of-intake partial batches: \{result.forced_partial_batches}")
+  println("  Events processed: \{result.events_processed}")
+  println("  Simulation time: \{result.simulation_time} ticks")
+}
+
+///|
+fn simulate_policy(policy : @moonsim.BatchPolicy) -> BatchSummary raise {
   let sim = @moonsim.Simulation::new()
   let state = BatchState::{
     policy,
@@ -33,6 +65,7 @@ fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit raise {
     batch_open: false,
     generation: 0,
     batch_count: 0,
+    quantity_releases: 0,
     timeout_releases: 0,
     forced_partial_batches: 0,
     overdue_entities: 0,
@@ -65,6 +98,11 @@ fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit raise {
       }
       let oldest_wait = sim.now() - state.batch_started_at
       if policy.should_trigger(state.queue.length(), oldest_wait).unwrap() {
+        if triggered_by_quantity(policy, state.queue.length()) {
+          state.quantity_releases += 1
+        } else {
+          state.timeout_releases += 1
+        }
         release_batch(sim, state, sim.now(), delivery_delay, max_wait)
       }
       if is_last_arrival {
@@ -88,18 +126,58 @@ fn run_policy(label : String, policy : @moonsim.BatchPolicy) -> Unit raise {
     fail("batch policy left entities incomplete or waiting")
   }
   let now = sim.now()
-  println("Policy: \{label}")
-  println("  Entities completed: \{state.metrics.entity_completed_count()}")
-  println("  Batches released: \{state.batch_count}")
-  println("  Mean waiting time: \{state.metrics.mean_waiting_time()} ticks")
-  println(
-    "  Throughput: \{state.metrics.throughput(now).unwrap()} entities/tick",
-  )
-  println("  Timeout releases: \{state.timeout_releases}")
-  println("  Overdue entities (> \{max_wait} ticks): \{state.overdue_entities}")
-  println("  End-of-intake partial batches: \{state.forced_partial_batches}")
-  println("  Events processed: \{events_processed}")
-  println("  Simulation time: \{now} ticks")
+  let result = BatchSummary::{
+    completed_count: state.metrics.entity_completed_count(),
+    final_wip: state.metrics.wip(),
+    final_queue_length: state.queue.length(),
+    batch_count: state.batch_count,
+    mean_waiting_time: state.metrics.mean_waiting_time(),
+    throughput: state.metrics.throughput(now).unwrap(),
+    quantity_releases: state.quantity_releases,
+    timeout_releases: state.timeout_releases,
+    forced_partial_batches: state.forced_partial_batches,
+    overdue_entities: state.overdue_entities,
+    events_processed,
+    simulation_time: now,
+  }
+  if result.completed_count != arrivals.length() ||
+    result.final_wip != 0 ||
+    result.final_queue_length != 0 ||
+    result.batch_count <= 0 ||
+    result.mean_waiting_time < 0.0 ||
+    result.overdue_entities < 0 ||
+    result.overdue_entities > result.completed_count ||
+    result.forced_partial_batches < 0 ||
+    result.forced_partial_batches > result.batch_count {
+    fail("batch model result violates completion or metric invariants")
+  }
+  match policy {
+    @moonsim.FixedTime(_) =>
+      if result.quantity_releases != 0 || result.timeout_releases == 0 {
+        fail("fixed-time policy did not release by elapsed time")
+      }
+    @moonsim.FixedBatch(_) =>
+      if result.quantity_releases == 0 || result.timeout_releases != 0 {
+        fail("fixed-batch policy did not release by its quantity threshold")
+      }
+    @moonsim.Hybrid(_, _) =>
+      if result.quantity_releases == 0 || result.timeout_releases == 0 {
+        fail("hybrid policy did not exercise both trigger conditions")
+      }
+  }
+  result
+}
+
+///|
+fn triggered_by_quantity(
+  policy : @moonsim.BatchPolicy,
+  waiting_count : Int,
+) -> Bool {
+  match policy {
+    @moonsim.FixedTime(_) => false
+    @moonsim.FixedBatch(_) => true
+    @moonsim.Hybrid(batch_size, _) => waiting_count >= batch_size
+  }
 }
 
 ///|
