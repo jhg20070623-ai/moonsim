@@ -9,12 +9,18 @@ This is a working project roadmap, not a promise that every item is already impl
 - Fixed-time, fixed-batch, and hybrid batch trigger policies.
 - Seeded random source and core flow metrics.
 - Runnable queueing, manufacturing, and logistics batching examples.
+- Queue dequeue results can include the measured wait duration through
+  `dequeue_with_wait`; the existing FIFO API and Queue-level aggregates remain
+  available.
+- Basic queue, manufacturing, and logistics examples record dequeue waits in
+  the shared Metrics collector.
+- Manufacturing and batching examples have regression tests for completion,
+  queue draining, metric bounds, capacity, and policy trigger behavior.
+- GitHub Actions workflow `MoonBit CI` is active on the public repository; runs
+  #37104594725 and #37105960682 completed successfully.
 
 ## Next engineering steps
 
-- Improve per-entity queue wait integration with the aggregate Metrics collector.
-- Add targeted tests for manufacturing and batching example behavior.
-- Verify the new GitHub Actions workflow on the public repository.
 - Consider priority queues, cancellation, and replication summaries only after the current API and examples are stable.
 
 ## Out of scope for this initial iteration

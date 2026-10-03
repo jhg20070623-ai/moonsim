@@ -1,5 +1,13 @@
 # Development Log
 
+## 2026-10-03 · Acceptance hardening
+
+- **Metrics integration:** Added `Queue::dequeue_with_wait`, which returns the dequeued value with its measured queue wait. The existing `dequeue` API and Queue-level aggregates remain available. All three examples now record the same dequeue measurement in the shared Metrics collector.
+- **Regression tests:** Extracted callable model functions for manufacturing and batching examples. Tests cover 20/20 manufacturing completions, drained WIP and queues, valid station utilization, positive cycle time and throughput, and peak resource usage within capacity. Batching tests cover all three policies completing 17/17 entities, drained WIP and queues, non-negative waits, valid overdue and partial-batch counts, and the configured time/quantity trigger paths.
+- **Local validation:** `moon fmt`, `moon check`, and `moon test` passed; 25 tests passed. `moon run examples/basic_queue`, `moon run examples/manufacturing_line`, and `moon run examples/logistics_batching` all completed successfully.
+- **Public CI:** GitHub Actions run [#37104594725](https://github.com/jhg20070623-ai/moonsim/actions/runs/37104594725) passed format, type check, tests, and examples. After the Metrics and regression-test commits were pushed, [run #37105960682](https://github.com/jhg20070623-ai/moonsim/actions/runs/37105960682) also completed successfully on `main`.
+- **Next:** Complete the release-readiness audit and record its findings.
+
 ## 2026-10-02 — Logistics batching example
 
 - **Implemented:** A runnable comparison of FixedTime(5), FixedBatch(3), and Hybrid(3, 5) using the same 17 scheduled arrivals and the MoonSim BatchPolicy trigger API.

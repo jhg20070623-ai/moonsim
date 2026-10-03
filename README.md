@@ -1,5 +1,7 @@
 # MoonSim
 
+[![MoonBit CI](https://github.com/jhg20070623-ai/moonsim/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jhg20070623-ai/moonsim/actions/workflows/ci.yml)
+
 MoonSim is a lightweight and reproducible discrete-event simulation engine written in MoonBit.
 
 MoonSim targets manufacturing, logistics, queueing, and process simulation. The current core provides a monotonic integer-tick clock, validated event actions, a stable priority queue, a scheduler with `run()` and `run_until()`, capacity-limited resources with utilization tracking, a generic FIFO queue with waiting-time statistics, route-following entities, fixed-time/fixed-count/hybrid batch policies, a reproducible seeded random stream, and metrics for cycle time, waiting time, WIP, throughput, and queue length.
