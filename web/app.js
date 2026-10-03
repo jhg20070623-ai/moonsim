@@ -54,7 +54,7 @@ let lastSubmission = null;
 
 function field(label, key, value, min, max, className = "") {
   const id = `param-${key}`;
-  return `<label class="form-field ${className}"><span>${label}</span><input id="${id}" name="${key}" type="number" min="${min}" max="${max}" step="1" value="${value}" required></label>`;
+  return `<label class="form-field ${className}"><span>${label}</span><input id="${id}" data-testid="${id}" name="${key}" type="number" min="${min}" max="${max}" step="1" value="${value}" required></label>`;
 }
 
 function renderFields() {
@@ -214,13 +214,13 @@ function renderKpis(result, aggregate) {
   document.querySelector("#kpi-grid").innerHTML = metrics.map(([label, key, unit]) => {
     const value = metricValue(result, key, aggregate);
     const range = metricRange(result, key, aggregate);
-    return `<article class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-value">${format(value)}<span class="kpi-unit">${unit}</span></div>${range ? `<div class="kpi-range">observed ${range}</div>` : ""}</article>`;
+    return `<article class="kpi-card" data-testid="kpi-${key}"><div class="kpi-label">${label}</div><div class="kpi-value">${format(value)}<span class="kpi-unit">${unit}</span></div>${range ? `<div class="kpi-range">observed ${range}</div>` : ""}</article>`;
   }).join("");
 }
 
-function renderResourceChart(resources) {
+function renderResourceChart(resources, testId = "resource-utilization-chart") {
   if (!Array.isArray(resources) || resources.length === 0) return "";
-  return `<article class="viz-card"><h3>Resource utilization</h3><p class="viz-subtitle">Busy time as a share of available capacity</p><div class="resource-list">${resources.map((resource) => {
+  return `<article class="viz-card" data-testid="${testId}"><h3>Resource utilization</h3><p class="viz-subtitle">Busy time as a share of available capacity</p><div class="resource-list">${resources.map((resource) => {
     const percent = Math.max(0, Math.min(100, resource.utilization * 100));
     return `<div class="resource-row"><span class="resource-name">${escapeHtml(resource.name)}</span><div class="bar-track" role="img" aria-label="${escapeHtml(resource.name)} utilization ${format(percent, 1)} percent"><div class="bar-fill" style="width:${percent}%"></div></div><span class="resource-value">${format(percent, 1)}%<span class="resource-capacity">×${resource.capacity}</span></span></div>`;
   }).join("")}</div></article>`;
@@ -240,9 +240,9 @@ function renderExperiment(result) {
   ];
   document.querySelector("#kpi-grid").innerHTML = cards.map(([label, key, unit]) => {
     const m = result[key];
-    return `<article class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-value">${format(m.mean)}<span class="kpi-unit">${unit}</span></div><div class="kpi-range">observed ${format(m.min)}–${format(m.max)}</div></article>`;
+    return `<article class="kpi-card" data-testid="kpi-${key}"><div class="kpi-label">${label}</div><div class="kpi-value">${format(m.mean)}<span class="kpi-unit">${unit}</span></div><div class="kpi-range">observed ${format(m.min)}–${format(m.max)}</div></article>`;
   }).join("");
-  document.querySelector("#visualizations").innerHTML = `<article class="viz-card"><h3>Replication spread</h3><p class="viz-subtitle">Mean and observed min–max for ${result.run_count} independent seeds</p><div class="logistics-table-wrap"><table class="compare-table"><thead><tr><th>Metric</th><th>Mean</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody>${cards.map(([label, key]) => `<tr><td class="policy-name">${label}</td><td>${format(result[key].mean)}</td><td>${format(result[key].min)}</td><td>${format(result[key].max)}</td></tr>`).join("")}</tbody></table></div></article>`;
+  document.querySelector("#visualizations").innerHTML = `<article class="viz-card" data-testid="experiment-summary"><h3>Replication spread</h3><p class="viz-subtitle">Mean and observed min–max for ${result.run_count} independent seeds</p><div class="logistics-table-wrap"><table class="compare-table"><thead><tr><th>Metric</th><th>Mean</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody>${cards.map(([label, key]) => `<tr><td class="policy-name">${label}</td><td>${format(result[key].mean)}</td><td>${format(result[key].min)}</td><td>${format(result[key].max)}</td></tr>`).join("")}</tbody></table></div></article>`;
 }
 
 function svgBars(values, labels, colors, title) {
@@ -284,14 +284,14 @@ function renderLogistics(results) {
   ];
   const charts = metricDefs.map(([title, getter]) => {
     const values = policies.map((policy) => getter(results[policy]));
-    return `<article class="viz-card"><h3>${title}</h3><p class="viz-subtitle">Same entities, arrivals, and seed for each policy</p>${svgBars(values, labels, colors, `${title} by batching policy`)}</article>`;
+    return `<article class="viz-card" data-testid="policy-chart-${title.toLowerCase().replaceAll(" ", "-")}"><h3>${title}</h3><p class="viz-subtitle">Same entities, arrivals, and seed for each policy</p>${svgBars(values, labels, colors, `${title} by batching policy`)}</article>`;
   }).join("");
   const rows = policies.map((policy, index) => {
     const result = results[policy];
     const stats = result.batch_statistics;
-    return `<tr><td class="policy-name"><span class="legend-mark ${index === 1 ? "orange" : index === 2 ? "blue" : ""}"></span>${labels[index]}</td><td>${format(result.completed, 0)} / ${format(result.parameters.entity_count, 0)}</td><td>${format(result.waiting_time)}</td><td>${format(result.throughput, 4)}</td><td>${format(stats?.batch_count ?? 0, 0)}</td><td>${format(stats?.overdue_entities ?? 0, 0)}</td></tr>`;
+    return `<tr data-policy="${policy}"><td class="policy-name"><span class="legend-mark ${index === 1 ? "orange" : index === 2 ? "blue" : ""}"></span>${labels[index]}</td><td>${format(result.completed, 0)} / ${format(result.parameters.entity_count, 0)}</td><td>${format(result.waiting_time)}</td><td>${format(result.throughput, 4)}</td><td>${format(stats?.batch_count ?? 0, 0)}</td><td>${format(stats?.overdue_entities ?? 0, 0)}</td></tr>`;
   }).join("");
-  return `${charts}<article class="viz-card logistics-table-wrap"><h3>Policy results</h3><p class="viz-subtitle">Values returned by the three MoonSim model runs</p><table class="compare-table"><thead><tr><th>Release policy</th><th>Completed</th><th>Waiting time</th><th>Throughput</th><th>Batches</th><th>Overdue</th></tr></thead><tbody>${rows}</tbody></table></article>`;
+  return `${charts}<article class="viz-card logistics-table-wrap" data-testid="logistics-policy-table"><h3>Policy results</h3><p class="viz-subtitle">Values returned by the three MoonSim model runs</p><table class="compare-table"><thead><tr><th>Release policy</th><th>Completed</th><th>Waiting time</th><th>Throughput</th><th>Batches</th><th>Overdue</th></tr></thead><tbody>${rows}</tbody></table></article>`;
 }
 
 function showRunSummary(text, seed) {
@@ -303,7 +303,8 @@ function displaySingle(result, request, rawResponse) {
   resultView.hidden = false;
   showRunSummary(`${presets[scenario].title} · ${format(result.events_processed, 0)} events processed`, request.seed);
   renderKpis(result, false);
-  document.querySelector("#visualizations").innerHTML = renderResourceChart(result.resource_utilization);
+  const chartTestId = scenario === "manufacturing_line" ? "manufacturing-utilization-chart" : "resource-utilization-chart";
+  document.querySelector("#visualizations").innerHTML = renderResourceChart(result.resource_utilization, chartTestId);
   exportPayload = { request, response: rawResponse };
 }
 
@@ -321,12 +322,12 @@ function displayLogistics(results, requests) {
   showRunSummary("Logistics batching · 3 policy runs", requests[0].seed);
   const completed = Object.values(results).every((item) => item.completed === requests[0].parameters.entity_count && item.wip === 0);
   document.querySelector("#kpi-grid").innerHTML = [
-    ["Policies completed", Object.values(results).filter((item) => item.completed === requests[0].parameters.entity_count).length, "of 3"],
-    ["Entities per policy", requests[0].parameters.entity_count, "entities"],
-    ["All runs drained", completed ? "Yes" : "No", "final WIP = 0"],
-    ["Seed", requests[0].seed, "same for each policy"],
-    ["Policies compared", "3", "fixed time · batch · hybrid"],
-  ].map(([label, value, unit]) => `<article class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-value">${value}<span class="kpi-unit">${unit}</span></div></article>`).join("");
+    ["Policies completed", Object.values(results).filter((item) => item.completed === requests[0].parameters.entity_count).length, "of 3", "kpi-policy-count"],
+    ["Entities per policy", requests[0].parameters.entity_count, "entities", "kpi-entity-count"],
+    ["All runs drained", completed ? "Yes" : "No", "final WIP = 0", "kpi-all-drained"],
+    ["Seed", requests[0].seed, "same for each policy", "kpi-seed"],
+    ["Policies compared", "3", "fixed time · batch · hybrid", "kpi-policies-compared"],
+  ].map(([label, value, unit, testId]) => `<article class="kpi-card" data-testid="${testId}"><div class="kpi-label">${label}</div><div class="kpi-value">${value}<span class="kpi-unit">${unit}</span></div></article>`).join("");
   document.querySelector("#visualizations").innerHTML = renderLogistics(results);
   exportPayload = { requests, responses: results };
 }

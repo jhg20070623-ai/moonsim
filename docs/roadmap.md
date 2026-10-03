@@ -17,6 +17,9 @@ This roadmap describes work that is available in the repository today and a smal
 - MoonSim Web Lab with parameter controls, KPI output, manufacturing utilization bars, three-policy logistics charts, and JSON download.
 - Web simulations run in a Worker; browser API limits are 10,000 entities per run and 20 replications, based on the documented local benchmark.
 - Static Web Lab build and smoke checks pass in MoonBit CI. The validated main deployment is available at [MoonSim Web Lab](https://jhg20070623-ai.github.io/moonsim/); run [#37126484162](https://github.com/jhg20070623-ai/moonsim/actions/runs/37126484162) completed both validation and Pages deployment.
+- Web Lab browser regressions cover Chromium and local Edge/Firefox runs, with deterministic seeded manufacturing comparison; see [browser compatibility results](browser-compatibility.md).
+- Public-facing Web Lab screenshots and a short real-browser demonstration are checked in under `docs/images/`.
+- CI uses current stable action majors and an explicit Ubuntu 26.04 runner; see [CI runtime notes](ci-runtime-notes.md).
 
 ## Next engineering steps
 
@@ -24,7 +27,7 @@ This roadmap describes work that is available in the repository today and a smal
 - Expand browser benchmarking to lower-power devices before changing the documented request bounds.
 - Add new scenario models only when they exercise reusable engine behavior and have testable invariants.
 
-## Out of scope for v0.2.0
+## Out of scope for v0.2.x
 
 - A graphical model editor.
 - Claims that example output reproduces an external factory or historical optimization.

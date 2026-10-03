@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "test:browser": "node scripts/browser-smoke.mjs chromium",
+    "test:browser:firefox": "node scripts/browser-smoke.mjs firefox"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
